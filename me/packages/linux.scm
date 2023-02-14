@@ -245,7 +245,8 @@
 (define %personal-extra-options
   `(  ;; kheaders module to avoid building failure
       ("CONFIG_IKHEADERS" . #f)
-      ;; module virtio_console required for initird
+      ;; modules required for initird
+      ("CONFIG_CRYPTO_XTS" . m)
       ("CONFIG_VIRTIO_CONSOLE" . m)
       ;; built in VFIO modules for pci passthrough
       ; ("CONFIG_VFIO_PCI" . #t)
