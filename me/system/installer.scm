@@ -31,6 +31,7 @@
   #:use-module (gnu packages package-management)
   #:use-module (me packages linux)
   #:use-module (me utils kicksecure)
+  #:use-module (nongnu packages linux)
   #:use-module (guix)
   #:export (installation-os-me))
 
