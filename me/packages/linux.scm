@@ -371,11 +371,11 @@ ARCH and optionally VARIANT, or #f if there is no such configuration."
     (description
      "Linux kernel with Xanmod and hardened patches"))))
 
-(define (make-xanmod-hardened-iso version)
-  (let ((base-xanmod-hardened-iso
+(define (make-linux-xanmod version)
+  (let ((base-linux-xanmod
           (corrupt-linux version
                          ""
-                         xanmod-hardened-source
+                         xanmod-source
                          '("x86_64-linux" "i686-linux")
                          #:configuration-file kernel-config
                          #:extra-options (append
@@ -385,11 +385,11 @@ ARCH and optionally VARIANT, or #f if there is no such configuration."
                                           (@@ (gnu packages linux)
                                               %default-extra-linux-options)))))
     (package
-      (inherit base-xanmod-hardened-iso)
-      (name "linux-xanmod-hardened-iso")
+      (inherit base-linux-xanmod)
+      (name "linux-xanmod")
       (version version)
       (arguments
-        (substitute-keyword-arguments (package-arguments base-xanmod-hardened-iso)
+        (substitute-keyword-arguments (package-arguments base-linux-xanmod)
           ((#:configure-flags flags)
             `(append '("CFLAGS=-O3")
                     ,flags))
@@ -411,13 +411,14 @@ ARCH and optionally VARIANT, or #f if there is no such configuration."
                       "CONFIG_ARCH_MMAP_RND_BITS=32"))))))))
       (native-inputs (modify-inputs (package-native-inputs linux-libre)
                       (append gcc-12 xz zstd)))
-    (home-page "https://github.com/anthraxx/linux-hardened")
-    (synopsis "Xanmod + hardened")
-    (description
-     "Linux kernel with Xanmod and hardened patches"))))
+      (home-page "https://xanmod.org/")
+      (synopsis "The Linux kernel and modules with Xanmod patches")
+      (description
+      "XanMod is a general-purpose Linux kernel distribution with custom settings and new features.
+    Built to provide a stable, responsive and smooth desktop experience."))))
 
-(define (make-linux-xanmod version)
-  (let ((base-linux-xanmod
+(define (make-linux-xanmod-iso version)
+  (let ((base-linux-xanmod-iso
           (corrupt-linux version
                          ""
                          xanmod-source
@@ -425,16 +426,16 @@ ARCH and optionally VARIANT, or #f if there is no such configuration."
                          #:configuration-file kernel-config
                          #:extra-options (append
                                           ; %waydroid-extra-linux-options
-                                          %khc-extra-linux-options
+                                          ; %khc-extra-linux-options
                                           %personal-extra-options
                                           (@@ (gnu packages linux)
                                               %default-extra-linux-options)))))
     (package
-      (inherit base-linux-xanmod)
-      (name "linux-xanmod")
+      (inherit base-linux-xanmod-iso)
+      (name "linux-xanmod-iso")
       (version version)
       (arguments
-        (substitute-keyword-arguments (package-arguments base-linux-xanmod)
+        (substitute-keyword-arguments (package-arguments base-linux-xanmod-iso)
           ((#:configure-flags flags)
             `(append '("CFLAGS=-O3")
                     ,flags))
@@ -536,11 +537,11 @@ ARCH and optionally VARIANT, or #f if there is no such configuration."
 (define-public linux-xanmod-hardened
   (make-xanmod-hardened xanmod-hardened-version))
 
-(define-public linux-xanmod-hardened-iso
-  (make-xanmod-hardened-iso xanmod-hardened-version))
-
 (define-public linux-xanmod
   (make-linux-xanmod xanmod-version))
+
+(define-public linux-xanmod-iso
+  (make-linux-xanmod-iso xanmod-version))
 
 (define-public linux-hardened
   (make-linux-hardened hardened-version))
