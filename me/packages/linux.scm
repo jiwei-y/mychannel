@@ -107,6 +107,17 @@
     (sha256 (base32
              "07agmxqa338wqmf3gxf90hn1384wc621mmhl7m8xj9bliq0lqj83"))))
 
+(define-public xanmod-hardened-source
+  (origin
+    (inherit (source-with-patches
+              linux-pristine-source
+              (list ;; %vfio-pci-pm-patch
+                    %xanmod-patch
+                    ;; %hardened-patch
+                    ; find " .procname	= "unprivileged_userns_clone", ", delete that trunk
+                    (local-file "patches/linux-6.1.8-hardened1.patch"))))
+    (modules '((guix build utils)))))
+
 (define-public xanmod-source
   (origin
     (inherit (source-with-patches
@@ -121,17 +132,6 @@
               linux-pristine-source
               (list ;; %vfio-pci-pm-patch
                     %hardened-patch)))
-    (modules '((guix build utils)))))
-
-(define-public xanmod-hardened-source
-  (origin
-    (inherit (source-with-patches
-              linux-pristine-source
-              (list ;; %vfio-pci-pm-patch
-                    %xanmod-patch
-                    ;; %hardened-patch
-                    ; find " .procname	= "unprivileged_userns_clone", ", delete that trunk
-                    (local-file "patches/linux-6.1.8-hardened1.patch"))))
     (modules '((guix build utils)))))
 
 (define %waydroid-extra-linux-options
@@ -326,96 +326,6 @@ ARCH and optionally VARIANT, or #f if there is no such configuration."
    revision
    source))
 
-(define (make-linux-xanmod version)
-  (let ((base-linux-xanmod
-          (corrupt-linux version
-                         ""
-                         xanmod-source
-                         '("x86_64-linux" "i686-linux")
-                         #:configuration-file kernel-config
-                         #:extra-options (append
-                                          ; %waydroid-extra-linux-options
-                                          %khc-extra-linux-options
-                                          %personal-extra-options
-                                          (@@ (gnu packages linux)
-                                              %default-extra-linux-options)))))
-    (package
-      (inherit base-linux-xanmod)
-      (name "linux-xanmod")
-      (version version)
-      (arguments
-        (substitute-keyword-arguments (package-arguments base-linux-xanmod)
-          ((#:configure-flags flags)
-            `(append '("CFLAGS=-O3")
-                    ,flags))
-          ((#:phases phases)
-            #~(modify-phases #$phases
-                (add-after 'patch-source-shebangs 'patch-randstruct
-                ;; customize the kernel RANDSTRUCT seed
-                  (lambda* (#:key inputs target #:allow-other-keys)
-                    (let ((source (assoc-ref %build-inputs "source")))
-                            (setenv "RANDSTRUCT_SRC" source)
-                            (substitute* "scripts/gen-randstruct-seed.sh"
-                              (("SEED=$(od -A n -t x8 -N 32 /dev/urandom | tr -d ' \n')") 
-                              "SEED=$(echo $ARCH $EXTRAVERSION $RANDSTRUCT_CFG $RANDSTRUCT_SRC | sha256sum | cut -d ' ' -f 1 | tr -d '\n')")))))))))
-      (native-inputs (modify-inputs (package-native-inputs linux-libre)
-                      (append gcc-12 xz zstd)))
-      (home-page "https://xanmod.org/")
-      (synopsis "The Linux kernel and modules with Xanmod patches")
-      (description
-      "XanMod is a general-purpose Linux kernel distribution with custom settings and new features.
-    Built to provide a stable, responsive and smooth desktop experience."))))
-
-(define (make-linux-xanmod-headers version)
-  (package
-    (inherit (corrupt-linux-headers version
-                                   ""
-                                   xanmod-source))
-    (name "linux-xanmod-headers")
-    (version version)
-    (native-inputs (modify-inputs (package-native-inputs linux-libre-headers)
-                     (append gcc-12)))
-    (home-page "https://xanmod.org/")
-    (synopsis "Linux-Xanmod kernel headers")
-    (description "Headers of the Linux-Xanmod kernel.")))
-
-(define (make-linux-hardened version)
-  (package
-    (inherit (corrupt-linux version
-                            ""
-                            hardened-source
-                            '("x86_64-linux" "i686-linux")
-
-                            #:extra-options (append
-                                             ; %waydroid-extra-linux-options
-                                             %khc-extra-linux-options
-                                             %personal-extra-options
-                                             (@@ (gnu packages linux)
-                                                 %default-extra-linux-options))))
-    (name "linux-hardened")
-    (version version)
-    ; (arguments
-    ;  '(#:configure-flags '("CFLAGS=-O3")))
-    (native-inputs (modify-inputs (package-native-inputs linux-libre)
-                     (append gcc-12 xz zstd)))
-    (home-page "https://github.com/anthraxx/linux-hardened")
-    (synopsis "Minimal supplement to upstream Kernel Self Protection Project changes")
-    (description
-     "Minimal supplement to upstream Kernel Self Protection Project changes. Features already provided by SELinux + Yama and archs other than multiarch arm64 / x86_64 aren't in scope.")))
-
-(define (make-linux-hardened-headers version)
-  (package
-    (inherit (corrupt-linux-headers version
-                                   ""
-                                   hardened-source))
-    (name "linux-hardened-headers")
-    (version version)
-    (native-inputs (modify-inputs (package-native-inputs linux-libre-headers)
-                     (append gcc-12)))
-    (home-page "https://github.com/anthraxx/linux-hardened")
-    (synopsis "Linux-hardened kernel headers")
-    (description "Headers of the Linux-hardened kernel.")))
-
 (define (make-xanmod-hardened version)
   (let ((base-xanmod-hardened
           (corrupt-linux version
@@ -461,14 +371,179 @@ ARCH and optionally VARIANT, or #f if there is no such configuration."
     (description
      "Linux kernel with Xanmod and hardened patches"))))
 
+(define (make-xanmod-hardened-iso version)
+  (let ((base-xanmod-hardened-iso
+          (corrupt-linux version
+                         ""
+                         xanmod-hardened-source
+                         '("x86_64-linux" "i686-linux")
+                         #:configuration-file kernel-config
+                         #:extra-options (append
+                                          ; %waydroid-extra-linux-options
+                                          ; %khc-extra-linux-options
+                                          %personal-extra-options
+                                          (@@ (gnu packages linux)
+                                              %default-extra-linux-options)))))
+    (package
+      (inherit base-xanmod-hardened-iso)
+      (name "linux-xanmod-hardened-iso")
+      (version version)
+      (arguments
+        (substitute-keyword-arguments (package-arguments base-xanmod-hardened-iso)
+          ((#:configure-flags flags)
+            `(append '("CFLAGS=-O3")
+                    ,flags))
+          ((#:phases phases)
+            #~(modify-phases #$phases
+                (add-after 'patch-source-shebangs 'patch-randstruct
+                ;; customize the kernel RANDSTRUCT seed
+                  (lambda* (#:key inputs target #:allow-other-keys)
+                            (substitute* "scripts/gen-randstruct-seed.sh"
+                              (("od -A n -t x8 -N 32 /dev/urandom") 
+                                "echo $ARCH $EXTRAVERSION $KBUILD_BUILD_USER $PATH $C_INCLUDE_PATH $CPLUS_INCLUDE_PATH | sha256sum | cut -d ' ' -f 1")
+                              (("tr -d ' ") 
+                                "tr -d '"))))
+                (add-after 'configure 'harden-config
+                ;; do some harden which we can't do in extra options
+                  (lambda* (#:key inputs #:allow-other-keys)
+                    (substitute* ".config"
+                      (("CONFIG_ARCH_MMAP_RND_BITS=28") 
+                      "CONFIG_ARCH_MMAP_RND_BITS=32"))))))))
+      (native-inputs (modify-inputs (package-native-inputs linux-libre)
+                      (append gcc-12 xz zstd)))
+    (home-page "https://github.com/anthraxx/linux-hardened")
+    (synopsis "Xanmod + hardened")
+    (description
+     "Linux kernel with Xanmod and hardened patches"))))
+
+(define (make-linux-xanmod version)
+  (let ((base-linux-xanmod
+          (corrupt-linux version
+                         ""
+                         xanmod-source
+                         '("x86_64-linux" "i686-linux")
+                         #:configuration-file kernel-config
+                         #:extra-options (append
+                                          ; %waydroid-extra-linux-options
+                                          %khc-extra-linux-options
+                                          %personal-extra-options
+                                          (@@ (gnu packages linux)
+                                              %default-extra-linux-options)))))
+    (package
+      (inherit base-linux-xanmod)
+      (name "linux-xanmod")
+      (version version)
+      (arguments
+        (substitute-keyword-arguments (package-arguments base-linux-xanmod)
+          ((#:configure-flags flags)
+            `(append '("CFLAGS=-O3")
+                    ,flags))
+          ((#:phases phases)
+            #~(modify-phases #$phases
+                (add-after 'patch-source-shebangs 'patch-randstruct
+                ;; customize the kernel RANDSTRUCT seed
+                  (lambda* (#:key inputs target #:allow-other-keys)
+                            (substitute* "scripts/gen-randstruct-seed.sh"
+                              (("od -A n -t x8 -N 32 /dev/urandom") 
+                                "echo $ARCH $EXTRAVERSION $KBUILD_BUILD_USER $PATH $C_INCLUDE_PATH $CPLUS_INCLUDE_PATH | sha256sum | cut -d ' ' -f 1")
+                              (("tr -d ' ") 
+                                "tr -d '"))))
+                (add-after 'configure 'harden-config
+                ;; do some harden which we can't do in extra options
+                  (lambda* (#:key inputs #:allow-other-keys)
+                    (substitute* ".config"
+                      (("CONFIG_ARCH_MMAP_RND_BITS=28") 
+                      "CONFIG_ARCH_MMAP_RND_BITS=32"))))))))
+      (native-inputs (modify-inputs (package-native-inputs linux-libre)
+                      (append gcc-12 xz zstd)))
+      (home-page "https://xanmod.org/")
+      (synopsis "The Linux kernel and modules with Xanmod patches")
+      (description
+      "XanMod is a general-purpose Linux kernel distribution with custom settings and new features.
+    Built to provide a stable, responsive and smooth desktop experience."))))
+
+(define (make-linux-xanmod-headers version)
+  (package
+    (inherit (corrupt-linux-headers version
+                                   ""
+                                   xanmod-source))
+    (name "linux-xanmod-headers")
+    (version version)
+    (native-inputs (modify-inputs (package-native-inputs linux-libre-headers)
+                     (append gcc-12)))
+    (home-page "https://xanmod.org/")
+    (synopsis "Linux-Xanmod kernel headers")
+    (description "Headers of the Linux-Xanmod kernel.")))
+
+(define (make-linux-hardened version)
+  (let ((base-linux-hardened
+          (corrupt-linux version
+                         ""
+                         hardened-source
+                         '("x86_64-linux" "i686-linux")
+                         #:configuration-file kernel-config
+                         #:extra-options (append
+                                          ; %waydroid-extra-linux-options
+                                          %khc-extra-linux-options
+                                          %personal-extra-options
+                                          (@@ (gnu packages linux)
+                                              %default-extra-linux-options)))))
+    (package
+      (inherit base-linux-hardened)
+      (name "linux-hardened")
+      (version version)
+      (arguments
+        (substitute-keyword-arguments (package-arguments base-linux-hardened)
+          ((#:configure-flags flags)
+            `(append '("CFLAGS=-O3")
+                    ,flags))
+          ((#:phases phases)
+            #~(modify-phases #$phases
+                (add-after 'patch-source-shebangs 'patch-randstruct
+                ;; customize the kernel RANDSTRUCT seed
+                  (lambda* (#:key inputs target #:allow-other-keys)
+                            (substitute* "scripts/gen-randstruct-seed.sh"
+                              (("od -A n -t x8 -N 32 /dev/urandom") 
+                                "echo $ARCH $EXTRAVERSION $KBUILD_BUILD_USER $PATH $C_INCLUDE_PATH $CPLUS_INCLUDE_PATH | sha256sum | cut -d ' ' -f 1")
+                              (("tr -d ' ") 
+                                "tr -d '"))))
+                (add-after 'configure 'harden-config
+                ;; do some harden which we can't do in extra options
+                  (lambda* (#:key inputs #:allow-other-keys)
+                    (substitute* ".config"
+                      (("CONFIG_ARCH_MMAP_RND_BITS=28") 
+                      "CONFIG_ARCH_MMAP_RND_BITS=32"))))))))
+      (native-inputs (modify-inputs (package-native-inputs linux-libre)
+                      (append gcc-12 xz zstd)))
+    (home-page "https://github.com/anthraxx/linux-hardened")
+    (synopsis "Minimal supplement to upstream Kernel Self Protection Project changes")
+    (description
+     "Minimal supplement to upstream Kernel Self Protection Project changes. Features already provided by SELinux + Yama and archs other than multiarch arm64 / x86_64 aren't in scope."))))
+
+(define (make-linux-hardened-headers version)
+  (package
+    (inherit (corrupt-linux-headers version
+                                   ""
+                                   hardened-source))
+    (name "linux-hardened-headers")
+    (version version)
+    (native-inputs (modify-inputs (package-native-inputs linux-libre-headers)
+                     (append gcc-12)))
+    (home-page "https://github.com/anthraxx/linux-hardened")
+    (synopsis "Linux-hardened kernel headers")
+    (description "Headers of the Linux-hardened kernel.")))
+
+(define-public linux-xanmod-hardened
+  (make-xanmod-hardened xanmod-hardened-version))
+
+(define-public linux-xanmod-hardened-iso
+  (make-xanmod-hardened-iso xanmod-hardened-version))
+
 (define-public linux-xanmod
   (make-linux-xanmod xanmod-version))
 
 (define-public linux-hardened
   (make-linux-hardened hardened-version))
-
-(define-public linux-xanmod-hardened
-  (make-xanmod-hardened xanmod-hardened-version))
 
 (define-public lkrg-my
   (package 
