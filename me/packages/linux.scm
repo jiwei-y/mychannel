@@ -270,6 +270,7 @@
       ("CONFIG_WERROR" . #f)
       ("CONFIG_LOCK_DOWN_KERNEL_FORCE_CONFIDENTIALITY" . #f)
       ("CONFIG_MODULE_SIG_FORCE" . #f)
+      ("CONFIG_HIBERNATION" . #t)
       ; LKRG requires CONFIG_KPROBES
       ; LKRG requires CONFIG_KALLSYMS_ALL (depends on CONFIG_KALLSYMS)
       ; LKRG requires ("CONFIG_TRIM_UNUSED_KSYMS" . #f) if it should be built as an out-of-tree kernel module
