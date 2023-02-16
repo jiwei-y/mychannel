@@ -27,15 +27,15 @@
   (@@ (gnu packages linux) source-with-patches))
 
 (define-public upstream-version
-  "6.1.8")
+  "6.1.11")
 (define-public upstream-major-version
   (version-major+minor upstream-version))
-(define-public xanmod-version
-  "6.1.8-xanmod1")
-(define-public hardened-version
-  "6.1.8-hardened1")
 (define-public xanmod-hardened-version
   upstream-version)
+(define-public xanmod-version
+  "6.1.11-xanmod1")
+(define-public hardened-version
+  "6.1.11-hardened1")
 
 (define-public linux-pristine-source
   (let ((version upstream-major-version)
@@ -48,31 +48,31 @@
 (define %xanmod-patch
   (origin
     (method url-fetch/xz-file)
-    ;; guix download https://github.com/xanmod/linux/releases/download/6.1.8-xanmod1/patch-6.1.8-xanmod1.xz -o ~/Downloads/6.1.8-xanmod1.xz 
+    ;; guix download https://github.com/xanmod/linux/releases/download/6.1.11-xanmod1/patch-6.1.11-xanmod1.xz -o ~/Downloads/6.1.11-xanmod1.xz 
     (file-name (string-append "linux-" xanmod-version ".patch"))
     (uri (string-append "https://github.com/xanmod/linux"
                         "/releases/download/" xanmod-version
                         "/patch-" xanmod-version ".xz"))
     (sha256 (base32
-             "0br6z0xym3vwgjr4cxb8byq1f16y6cf0vaibfcgw6s0qhbn11pan"))))
+             "0qb6cmf6pjp4k4yk1nbsd9klnynharhyma2lzpnk9imm6mx3dqap"))))
 
 (define %hardened-patch
   (origin
     (method url-fetch)
-    ;; guix download https://github.com/anthraxx/linux-hardened/releases/download/6.1.8-hardened1/linux-hardened-6.1.8-hardened1.patch -o ~/dotfiles/mychannel/me/packages/patches/linux-6.1.8-hardened1.patch 
+    ;; guix download https://github.com/anthraxx/linux-hardened/releases/download/6.1.11-hardened1/linux-hardened-6.1.11-hardened1.patch -o ~/dotfiles/mychannel/me/packages/patches/linux-6.1.11-hardened1.patch 
     (file-name (string-append "linux-" hardened-version ".patch"))
     (uri (string-append
           "https://github.com/anthraxx/linux-hardened/releases/download/"
           hardened-version "/linux-hardened-" hardened-version ".patch"))
     (sha256 (base32
-             "1ry0cb1dsq84n6cxn8ndx47qz1g69kqlfkb16rrlgk49w81i8y8z"))))
+             "1pydcjy2cjnb4zxcqr41hr34fg8alph314xasdsfvdw4zaz55s6h"))))
 
 ; (define %adjusted-hardened-patch
 ;   (let* ((version hardened-version)
 ;          (patch (string-append "linux-" version ".patch"))
 ;          (source (origin
 ;                    (method url-fetch)
-;                    ;; guix download https://github.com/anthraxx/linux-hardened/releases/download/6.1.8-hardened1/linux-hardened-6.1.8-hardened1.patch -o ~/Downloads/linux-6.1.8-hardened1.patch
+;                    ;; guix download https://github.com/anthraxx/linux-hardened/releases/download/6.1.11-hardened1/linux-hardened-6.1.11-hardened1.patch -o ~/Downloads/linux-6.1.11-hardened1.patch
 ;                    (uri (string-append
 ;                          "https://github.com/anthraxx/linux-hardened/releases/download/"
 ;                          version "/linux-hardened-" version ".patch"))
@@ -115,7 +115,7 @@
                     %xanmod-patch
                     ;; %hardened-patch
                     ; find " .procname	= "unprivileged_userns_clone", ", delete that trunk
-                    (local-file "patches/linux-6.1.8-hardened1.patch"))))
+                    (local-file "patches/linux-6.1.11-hardened1.patch"))))
     (modules '((guix build utils)))))
 
 (define-public xanmod-source
@@ -417,52 +417,6 @@ ARCH and optionally VARIANT, or #f if there is no such configuration."
       "XanMod is a general-purpose Linux kernel distribution with custom settings and new features.
     Built to provide a stable, responsive and smooth desktop experience."))))
 
-(define (make-linux-xanmod-iso version)
-  (let ((base-linux-xanmod-iso
-          (corrupt-linux version
-                         ""
-                         xanmod-source
-                         '("x86_64-linux" "i686-linux")
-                         #:configuration-file kernel-config
-                         #:extra-options (append
-                                          ; %waydroid-extra-linux-options
-                                          ; %khc-extra-linux-options
-                                          %personal-extra-options
-                                          (@@ (gnu packages linux)
-                                              %default-extra-linux-options)))))
-    (package
-      (inherit base-linux-xanmod-iso)
-      (name "linux-xanmod-iso")
-      (version version)
-      (arguments
-        (substitute-keyword-arguments (package-arguments base-linux-xanmod-iso)
-          ((#:configure-flags flags)
-            `(append '("CFLAGS=-O3")
-                    ,flags))
-          ((#:phases phases)
-            #~(modify-phases #$phases
-                (add-after 'patch-source-shebangs 'patch-randstruct
-                ;; customize the kernel RANDSTRUCT seed
-                  (lambda* (#:key inputs target #:allow-other-keys)
-                            (substitute* "scripts/gen-randstruct-seed.sh"
-                              (("od -A n -t x8 -N 32 /dev/urandom") 
-                                "echo $ARCH $EXTRAVERSION $KBUILD_BUILD_USER $PATH $C_INCLUDE_PATH $CPLUS_INCLUDE_PATH | sha256sum | cut -d ' ' -f 1")
-                              (("tr -d ' ") 
-                                "tr -d '"))))
-                (add-after 'configure 'harden-config
-                ;; do some harden which we can't do in extra options
-                  (lambda* (#:key inputs #:allow-other-keys)
-                    (substitute* ".config"
-                      (("CONFIG_ARCH_MMAP_RND_BITS=28") 
-                      "CONFIG_ARCH_MMAP_RND_BITS=32"))))))))
-      (native-inputs (modify-inputs (package-native-inputs linux-libre)
-                      (append gcc-12 xz zstd)))
-      (home-page "https://xanmod.org/")
-      (synopsis "The Linux kernel and modules with Xanmod patches")
-      (description
-      "XanMod is a general-purpose Linux kernel distribution with custom settings and new features.
-    Built to provide a stable, responsive and smooth desktop experience."))))
-
 (define (make-linux-xanmod-headers version)
   (package
     (inherit (corrupt-linux-headers version
@@ -539,9 +493,6 @@ ARCH and optionally VARIANT, or #f if there is no such configuration."
 
 (define-public linux-xanmod
   (make-linux-xanmod xanmod-version))
-
-(define-public linux-xanmod-iso
-  (make-linux-xanmod-iso xanmod-version))
 
 (define-public linux-hardened
   (make-linux-hardened hardened-version))

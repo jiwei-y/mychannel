@@ -102,13 +102,13 @@ index e7b3fa7bb3f7..b53080a2b79e 100644
  	If set, provide RFC2861 behavior and time out the congestion
  	window after an idle period.  An idle period is defined at
 diff --git a/Makefile b/Makefile
-index 49261450039a..70b2e7b4b00f 100644
+index e039f2af1772..73e68a80d3a4 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -2,7 +2,7 @@
  VERSION = 6
  PATCHLEVEL = 1
- SUBLEVEL = 8
+ SUBLEVEL = 11
 -EXTRAVERSION =
 +EXTRAVERSION = -hardened1
  NAME = Hurr durr I'ma ninja sloth
@@ -489,7 +489,7 @@ index 3f040c6e5d13..524c7523be47 100644
  /* Used in PAGE_KERNEL_* macros which are reasonably used out-of-tree: */
  EXPORT_SYMBOL(__default_kernel_pte_mask);
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 63abbe342b28..e663e5e10e3a 100644
+index 83fbc7c54617..a5b157702396 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
 @@ -1099,7 +1099,7 @@ static void blk_complete_reqs(struct llist_head *list)
@@ -502,7 +502,7 @@ index 63abbe342b28..e663e5e10e3a 100644
  	blk_complete_reqs(this_cpu_ptr(&blk_cpu_done));
  }
 diff --git a/drivers/ata/libata-core.c b/drivers/ata/libata-core.c
-index d3ce5c383f3a..b5f30a104338 100644
+index 26a75f5cce95..bcc80858583f 100644
 --- a/drivers/ata/libata-core.c
 +++ b/drivers/ata/libata-core.c
 @@ -4602,7 +4602,7 @@ void __ata_qc_complete(struct ata_queued_cmd *qc)
@@ -1394,10 +1394,10 @@ index 14d9384fba05..3e4ce49bf2f5 100644
  	rcu_core();
  }
 diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
-index 0f32acb05055..04f403ea5dcb 100644
+index 2c3d0d49c80e..d68d832b4036 100644
 --- a/kernel/sched/fair.c
 +++ b/kernel/sched/fair.c
-@@ -11559,7 +11559,7 @@ static int newidle_balance(struct rq *this_rq, struct rq_flags *rf)
+@@ -11557,7 +11557,7 @@ static int newidle_balance(struct rq *this_rq, struct rq_flags *rf)
   * run_rebalance_domains is triggered when needed from the scheduler tick.
   * Also triggered for nohz idle balancing (with nohz_balancing_kick set).
   */
@@ -1693,10 +1693,10 @@ index a0b2dbfcfa23..89d51fbc26b1 100644
  	enum kobj_ns_type type = ops->type;
  	int error;
 diff --git a/lib/nlattr.c b/lib/nlattr.c
-index b67a53e29b8f..c53998221a66 100644
+index dffd60e4065f..19e384fc8cdd 100644
 --- a/lib/nlattr.c
 +++ b/lib/nlattr.c
-@@ -802,6 +802,8 @@ int nla_memcpy(void *dest, const struct nlattr *src, int count)
+@@ -805,6 +805,8 @@ int nla_memcpy(void *dest, const struct nlattr *src, int count)
  {
  	int minlen = min_t(int, count, nla_len(src));
  
