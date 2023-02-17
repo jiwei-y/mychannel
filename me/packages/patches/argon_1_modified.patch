@@ -4,19 +4,19 @@
  2 files changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/grub-core/kern/dl.c b/grub-core/kern/dl.c
-index 48f8a7907..7d395096f 100644
+index 48f8a79..7d39509 100644
 --- a/grub-core/kern/dl.c
 +++ b/grub-core/kern/dl.c
-@@ -462,6 +462,7 @@ grub_dl_check_license (Elf_Ehdr *e)
-  Elf_Shdr *s = grub_dl_find_section (e, ".module_license");
+@@ -462,7 +462,8 @@ grub_dl_check_license (Elf_Ehdr *e)
+   Elf_Shdr *s = grub_dl_find_section (e, ".module_license");
    if (s && (grub_strcmp ((char *) e + s->sh_offset, "LICENSE=GPLv3") == 0
-       || grub_strcmp ((char *) e + s->sh_offset, "LICENSE=GPLv3+") == 0
--      || grub_strcmp ((char *) e + s->sh_offset, "LICENSE=GPLv2+") == 0))
-+      || grub_strcmp ((char *) e + s->sh_offset, "LICENSE=GPLv2+") == 0
-+      || grub_strcmp ((char *) e + s->sh_offset, "LICENSE=CC0") == 0))
+            || grub_strcmp ((char *) e + s->sh_offset, "LICENSE=GPLv3+") == 0
+-           || grub_strcmp ((char *) e + s->sh_offset, "LICENSE=GPLv2+") == 0))
++           || grub_strcmp ((char *) e + s->sh_offset, "LICENSE=GPLv2+") == 0
++           || grub_strcmp ((char *) e + s->sh_offset, "LICENSE=CC0") == 0))
      return GRUB_ERR_NONE;
    return grub_error (GRUB_ERR_BAD_MODULE, "incompatible license");
-}
+ }
 diff --git a/util/grub-module-verifierXX.c b/util/grub-module-verifierXX.c
 index ceb24309a..284f9026e 100644
 --- a/util/grub-module-verifierXX.c
