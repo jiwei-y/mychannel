@@ -140,7 +140,8 @@
 
 (define-public grub-efi-luks2-source
   (source-with-patches (package-source grub-efi)
-                       (list %argon-patch-1
+                       (list ; %argon-patch-1
+                             (local-file "patches/argon_1_modified.patch")
                              %argon-patch-2
                              %argon-patch-3
                              %argon-patch-4
@@ -152,4 +153,27 @@
     (inherit grub-efi)
     (name "grub-efi-luks2")
     (source grub-efi-luks2-source)
+    (synopsis "GRand Unified Boot loader (with Argon2 and better LUKS2 support)")))
+
+(define-public grub-efi-luks2-git
+  (package
+    (inherit grub-efi)
+    (name "grub-efi-luks2-git")
+    (source (origin
+              (method git-fetch)
+              (uri (string-append "mirror://gnu/grub/grub-" version ".tar.xz"))
+              (sha256
+               (base32
+                "1qbycnxkx07arj9f2nlsi9kp0dyldspbv07ysdyd34qvz55a97mp"))
+              (patches (search-patches
+                        "grub-efi-fat-serial-number.patch"
+                        "grub-setup-root.patch"))
+              (modules '((guix build utils)))
+              (snippet
+               '(begin
+                  ;; Adjust QEMU invocation to not use a deprecated device
+                  ;; name that was removed in QEMU 6.0.  Remove for >2.06.
+                  (substitute* "tests/ahci_test.in"
+                    (("ide-drive")
+                     "ide-hd"))))))
     (synopsis "GRand Unified Boot loader (with Argon2 and better LUKS2 support)")))
