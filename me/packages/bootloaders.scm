@@ -96,7 +96,7 @@
     ;; guix download https://aur.archlinux.org/cgit/aur.git/plain/argon_1.patch?h=grub-improved-luks2-git -o ~/Downloads/argon_1.patch 
     (uri "https://aur.archlinux.org/cgit/aur.git/plain/argon_1.patch?h=grub-improved-luks2-git")
     (sha256 (base32
-             "1pydcjy2cjnb4zxcqr41hr34fg8alph314xasdsfvdw4zaz55s6h"))))
+             "0hc5yigqj73lk4rp4p0fznhyrpp6c7kpvbqychajrh3kmajl7zhn"))))
 
 (define %argon-patch-2
   (origin
@@ -104,7 +104,7 @@
     ;; guix download https://aur.archlinux.org/cgit/aur.git/plain/argon_2.patch?h=grub-improved-luks2-git -o ~/Downloads/argon_2.patch 
     (uri "https://aur.archlinux.org/cgit/aur.git/plain/argon_2.patch?h=grub-improved-luks2-git")
     (sha256 (base32
-             "1pydcjy2cjnb4zxcqr41hr34fg8alph314xasdsfvdw4zaz55s6h"))))
+             "1xl3g4frxzg594c3cpzp3ljdhwaxy7z5viii6d0kyvxl7a1wki26"))))
 
 (define %argon-patch-3
   (origin
@@ -112,7 +112,7 @@
     ;; guix download https://aur.archlinux.org/cgit/aur.git/plain/argon_3.patch?h=grub-improved-luks2-git -o ~/Downloads/argon_3.patch 
     (uri "https://aur.archlinux.org/cgit/aur.git/plain/argon_3.patch?h=grub-improved-luks2-git")
     (sha256 (base32
-             "1pydcjy2cjnb4zxcqr41hr34fg8alph314xasdsfvdw4zaz55s6h"))))
+             "0khycisd19prkr2g8ahv0cf15l1dlj5wbi96jd4k7aq0a805dahm"))))
 
 (define %argon-patch-4
   (origin
@@ -120,7 +120,7 @@
     ;; guix download https://aur.archlinux.org/cgit/aur.git/plain/argon_4.patch?h=grub-improved-luks2-git -o ~/Downloads/argon_4.patch 
     (uri "https://aur.archlinux.org/cgit/aur.git/plain/argon_4.patch?h=grub-improved-luks2-git")
     (sha256 (base32
-             "1pydcjy2cjnb4zxcqr41hr34fg8alph314xasdsfvdw4zaz55s6h"))))
+             "1z636s8anrj1zsavkqyby0nnvbv828kg4n8jam09751q0m961fzl"))))
 
 (define %argon-patch-5
   (origin
@@ -128,7 +128,7 @@
     ;; guix download https://aur.archlinux.org/cgit/aur.git/plain/argon_5.patch?h=grub-improved-luks2-git -o ~/Downloads/argon_5.patch 
     (uri "https://aur.archlinux.org/cgit/aur.git/plain/argon_5.patch?h=grub-improved-luks2-git")
     (sha256 (base32
-             "1pydcjy2cjnb4zxcqr41hr34fg8alph314xasdsfvdw4zaz55s6h"))))
+             "0vyaj5w6gjr0bph9h66fwax3a53yglgaibxff4gjp37rfk17zpxy"))))
 
 (define %grub-install_luks2-patch
   (origin
@@ -136,7 +136,7 @@
     ;; guix download https://aur.archlinux.org/cgit/aur.git/plain/grub-install_luks2.patch?h=grub-improved-luks2-git -o ~/Downloads/grub-install_luks2.patch 
     (uri "https://aur.archlinux.org/cgit/aur.git/plain/grub-install_luks2.patch?h=grub-improved-luks2-git")
     (sha256 (base32
-             "1pydcjy2cjnb4zxcqr41hr34fg8alph314xasdsfvdw4zaz55s6h"))))
+             "1pq1kkzvxswlzz8yj0zmx6zg3fa227b2s6mnbq55c2pv1xh6i1h7"))))
 
 (define-public grub-efi-luks2-source
   (source-with-patches (package-source grub-efi)
