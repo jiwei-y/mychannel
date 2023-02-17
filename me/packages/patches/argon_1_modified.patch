@@ -16,6 +16,7 @@ index 48f8a7907..7d395096f 100644
 +      || grub_strcmp ((char *) e + s->sh_offset, "LICENSE=CC0") == 0))
      return GRUB_ERR_NONE;
    return grub_error (GRUB_ERR_BAD_MODULE, "incompatible license");
+}
 diff --git a/util/grub-module-verifierXX.c b/util/grub-module-verifierXX.c
 index ceb24309a..284f9026e 100644
 --- a/util/grub-module-verifierXX.c
