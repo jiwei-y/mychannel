@@ -7,7 +7,7 @@ diff --git a/grub-core/kern/dl.c b/grub-core/kern/dl.c
 index 48f8a7907..7d395096f 100644
 --- a/grub-core/kern/dl.c
 +++ b/grub-core/kern/dl.c
-@@ -467,6 +467,7 @@
+@@ -462,6 +462,7 @@
   Elf_Shdr *s = grub_dl_find_section (e, ".module_license");
    if (s && (grub_strcmp ((char *) e + s->sh_offset, "LICENSE=GPLv3") == 0
        || grub_strcmp ((char *) e + s->sh_offset, "LICENSE=GPLv3+") == 0
