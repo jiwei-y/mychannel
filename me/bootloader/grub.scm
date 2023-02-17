@@ -1,0 +1,28 @@
+(define-module (me bootloader grub)
+  #:use-module (guix build union)
+  #:use-module (guix records)
+  #:use-module (guix store)
+  #:use-module (guix utils)
+  #:use-module (guix gexp)
+  #:use-module (gnu artwork)
+  #:use-module (gnu bootloader)
+  #:use-module (gnu bootloader grub)
+  #:use-module (gnu system uuid)
+  #:use-module (gnu system file-systems)
+  #:use-module (gnu system keyboard)
+  #:use-module (gnu system locale)
+  #:use-module (gnu packages bootloaders)
+  #:autoload   (gnu packages gtk) (guile-cairo guile-rsvg)
+  #:autoload   (gnu packages xorg) (xkeyboard-config)
+  #:use-module (ice-9 match)
+  #:use-module (ice-9 regex)
+  #:use-module (me packages bootloaders)
+  #:use-module (srfi srfi-1)
+  #:use-module (srfi srfi-2)
+  #:export (grub-efi-luks2-bootloader))
+
+
+(define grub-efi-luks2-bootloader
+  (bootloader
+   (inherit grub-efi-bootloader)
+   (package grub-efi-luks2)))
