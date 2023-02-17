@@ -7,7 +7,7 @@ diff --git a/grub-core/kern/dl.c b/grub-core/kern/dl.c
 index 48f8a7907..7d395096f 100644
 --- a/grub-core/kern/dl.c
 +++ b/grub-core/kern/dl.c
-@@ -467,7 +467,8 @@ grub_dl_check_license (Elf_Ehdr *e)
+@@ -467,6 +467,7 @@ grub_dl_check_license (Elf_Ehdr *e)
 
    if (s && (grub_strcmp ((char *) e + s->sh_offset, "LICENSE=GPLv3") == 0
        || grub_strcmp ((char *) e + s->sh_offset, "LICENSE=GPLv3+") == 0
@@ -21,7 +21,7 @@ diff --git a/util/grub-module-verifierXX.c b/util/grub-module-verifierXX.c
 index ceb24309a..284f9026e 100644
 --- a/util/grub-module-verifierXX.c
 +++ b/util/grub-module-verifierXX.c
-@@ -157,7 +157,8 @@ check_license (const char * const filena
+@@ -157,8 +157,8 @@ check_license (const char * const filena
    Elf_Shdr *s = find_section (arch, e, ".module_license");
    if (s && (strcmp ((char *) e + grub_target_to_host(s->sh_offset), "LICENSE=GPLv3") == 0
  	    || strcmp ((char *) e + grub_target_to_host(s->sh_offset), "LICENSE=GPLv3+") == 0
@@ -52,5 +52,3 @@ T6EJwe1+WyHkAB5nVFqiPbUM7/xWw4LwQctjLBtJ9JW/+5n/rCAtkUIGOrQIedZg
 r/lckIxn6ujrKwIu5Rh03eqTIrG5PZ7Uy8LdMut0IOALp25zO7o=
 =w8r3
 -----END PGP SIGNATURE-----
-
-
