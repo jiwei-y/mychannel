@@ -185,7 +185,7 @@
     (source grub-efi-luks2-source)
     (synopsis "GRand Unified Boot loader (with Argon2 and better LUKS2 support)")))
 
-(define-public grub-efi-luks2-git
+(define-public grub-efi-luks2-git   ; also unable to build
   (package
     (inherit grub-efi)
     (name "grub-efi-luks2-git")

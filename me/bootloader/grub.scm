@@ -25,4 +25,4 @@
 (define grub-efi-luks2-bootloader
   (bootloader
    (inherit grub-efi-bootloader)
-   (package grub-efi-luks2-git)))
+   (package grub-efi-luks2)))
