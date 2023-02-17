@@ -161,7 +161,7 @@
           (url "https://git.savannah.gnu.org/git/grub")
           ; git ls-remote https://git.savannah.gnu.org/git/grub HEAD
           (commit "f7564844f82b57078d601befadc438b5bc1fa01b")))
-    (file-name (git-file-name))
+    (file-name "grub-git")
     (sha256
     ; git clone --depth 1 https://git.savannah.gnu.org/git/grub ~/Downloads/grub-git
     ; guix hash --serializer=nar -x ~/Downloads/grub-git
