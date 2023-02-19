@@ -284,12 +284,16 @@
       ;; LKRG in-tree module (not supported yet)
       ; ("CONFIG_SECURITY_LKRG" . #t)
 
+      ;; use custom DSDT to enable s3 sleep
+      ("CONFIG_ACPI_CUSTOM_DSDT" . #t)
+      ("CONFIG_ACPI_CUSTOM_DSDT_FILE" . "/DSDT/dsdt.hex")
+
       ;; cpu specified optimisation
       ("CONFIG_GENERIC_CPU" . #f)
       ("CONFIG_GENERIC_CPU2" . #f)
-      ("CONFIG_MZEN3" . #t)
+      ("CONFIG_MZEN3" . #f)
       ("CONFIG_MNATIVE_INTEL" . #f)
-      ("CONFIG_MNATIVE_AMD" . #f)))
+      ("CONFIG_MNATIVE_AMD" . #t)))
 
 (define* (kernel-config arch #:key variant)
   "Return a file-like object of the Linux-Libre build configuration file for
