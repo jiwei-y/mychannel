@@ -343,7 +343,7 @@
                                ;; Extraversion is used instead.
                                #:configs (config->string
                                           '(("CONFIG_LOCALVERSION" . "")))
-                               #:extra-version %xanmod-revision)))
+                               #:extra-version xanmod-revision)))
     (package
       (inherit base)
       (version xanmod-hardened-version)
