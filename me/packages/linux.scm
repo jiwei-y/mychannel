@@ -360,7 +360,7 @@
                   (when (file-exists? "localversion")
                     (delete-file "localversion"))))
               (add-after 'remove-localversion 'customize-dsdt
-                (lambda* (#:key inputs native-inputs #:allow-other-keys)
+                (lambda* (#:key copy-file #:allow-other-keys)
                   (copy-file (local-file "DSDT/dsdt.hex") "dsdt.hex")
                   (chmod ".config" #o444)))
               (add-after 'patch-source-shebangs 'patch-randstruct
