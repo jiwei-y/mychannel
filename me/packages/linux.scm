@@ -361,8 +361,7 @@
                     (delete-file "localversion"))))
               (add-after 'remove-localversion 'customize-dsdt
                 (lambda* (#:key inputs native-inputs #:allow-other-keys)
-                  (copy-file (search-input-file native-inputs "dsdt.hex") "dsdt.hex")
-                  ;; Adapted from `make-linux-libre*'.
+                  (copy-file (local-file "DSDT/dsdt.hex") "dsdt.hex")
                   (chmod ".config" #o444)))
               (add-after 'patch-source-shebangs 'patch-randstruct
               ;; customize the kernel RANDSTRUCT seed
@@ -398,8 +397,7 @@
       (native-inputs
        (modify-inputs (package-native-inputs base)
          ;; cpio is needed for CONFIG_IKHEADERS.
-         (append gcc-12 cpio zstd
-                 (local-file "DSDT/dsdt.hex"))))
+         (append gcc-12 cpio zstd)))
       (home-page "https://github.com/anthraxx/linux-hardened")
       (supported-systems '("x86_64-linux"))
       (synopsis
