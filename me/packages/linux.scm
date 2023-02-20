@@ -359,6 +359,11 @@
                 (lambda _
                   (when (file-exists? "localversion")
                     (delete-file "localversion"))))
+              (add-after 'remove-localversion 'customize-dsdt
+                (lambda _
+                  (copy-file (search-input-file native-inputs "dsdt.hex") "dsdt.hex")
+                  ;; Adapted from `make-linux-libre*'.
+                  (chmod ".config" #o444)))
               (add-after 'patch-source-shebangs 'patch-randstruct
               ;; customize the kernel RANDSTRUCT seed
                 (lambda* (#:key inputs target #:allow-other-keys)
@@ -387,7 +392,7 @@
               (add-after 'configure 'harden-config
               ;; do some harden which we can't do in extra options
                 (lambda* (#:key inputs #:allow-other-keys)
-                  (substitute* '(".config" "arch/x86/configs/config_x86-64-v2")
+                  (substitute* '(".config" "arch/x86/configs/guix_defconfig")
                     (("CONFIG_ARCH_MMAP_RND_BITS=28") 
                     "CONFIG_ARCH_MMAP_RND_BITS=32"))))))))
       (native-inputs
