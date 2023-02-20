@@ -286,7 +286,7 @@
 
       ;; use custom DSDT to enable s3 sleep
       ("CONFIG_ACPI_CUSTOM_DSDT" . #t)
-      ("CONFIG_ACPI_CUSTOM_DSDT_FILE" . "/DSDT/dsdt.hex")
+      ("CONFIG_ACPI_CUSTOM_DSDT_FILE" . "/tmp/DSDT/dsdt.hex")
 
       ;; cpu specified optimisation
       ("CONFIG_GENERIC_CPU" . #f)
