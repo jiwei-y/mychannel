@@ -393,7 +393,7 @@
        (modify-inputs (package-native-inputs base)
          ;; cpio is needed for CONFIG_IKHEADERS.
          (append gcc-12 cpio zstd
-                 ("dsdt.hex" ,(local-file "DSDT/dsdt.hex")))))
+                 `(("dsdt.hex" ,(local-file "DSDT/dsdt.hex"))))))
       (home-page "https://github.com/anthraxx/linux-hardened")
       (supported-systems '("x86_64-linux"))
       (synopsis
