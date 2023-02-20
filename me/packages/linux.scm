@@ -360,7 +360,7 @@
                   (when (file-exists? "localversion")
                     (delete-file "localversion"))))
               (add-after 'remove-localversion 'customize-dsdt
-                (lambda _
+                (lambda* (#:key inputs native-inputs #:allow-other-keys)
                   (copy-file (search-input-file native-inputs "dsdt.hex") "dsdt.hex")
                   ;; Adapted from `make-linux-libre*'.
                   (chmod ".config" #o444)))
