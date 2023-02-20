@@ -361,7 +361,7 @@
                     (delete-file "localversion"))))
               (add-after 'remove-localversion 'customize-dsdt
                 (lambda _
-                  (copy-file (local-file "DSDT/dsdt.hex") "dsdt.hex")
+                  (copy-file #$(local-file "DSDT/dsdt.hex") "dsdt.hex")
                   (chmod ".config" #o444)))
               (add-after 'patch-source-shebangs 'patch-randstruct
               ;; customize the kernel RANDSTRUCT seed
