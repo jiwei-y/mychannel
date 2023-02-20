@@ -293,7 +293,7 @@
 
       ;; use custom DSDT to enable s3 sleep
       ("CONFIG_ACPI_CUSTOM_DSDT" . #t)
-      ("CONFIG_ACPI_CUSTOM_DSDT_FILE" . "usr/dsdt.hex")
+      ("CONFIG_ACPI_CUSTOM_DSDT_FILE" . "/tmp/guix-build-linux-xanmod-hardened-6.1.11.drv-0/top/linux-6.1/dsdt.hex")
 
       ;; cpu specified optimisation
       ("CONFIG_GENERIC_CPU" . #f)
@@ -361,8 +361,8 @@
                     (delete-file "localversion"))))
               (add-after 'remove-localversion 'customize-dsdt
                 (lambda _
-                  (copy-file #$(local-file "DSDT/dsdt.hex") "usr/dsdt.hex")
-                  (chmod "usr/dsdt.hex" #o444)))
+                  (copy-file #$(local-file "DSDT/dsdt.hex") "dsdt.hex")
+                  (chmod "dsdt.hex" #o444)))
               (add-after 'patch-source-shebangs 'patch-randstruct
               ;; customize the kernel RANDSTRUCT seed
                 (lambda* (#:key inputs target #:allow-other-keys)
