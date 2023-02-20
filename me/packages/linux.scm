@@ -56,10 +56,10 @@
   (origin
     (method url-fetch/xz-file)
     ;; guix download https://github.com/xanmod/linux/releases/download/6.1.11-xanmod1/patch-6.1.11-xanmod1.xz -o ~/Downloads/6.1.11-xanmod1.xz 
-    (file-name (string-append "linux-" xanmod-version ".patch"))
+    (file-name (string-append "linux-" xanmod-version "-" xanmod-revision ".patch"))
     (uri (string-append "https://github.com/xanmod/linux"
-                        "/releases/download/" xanmod-version
-                        "/patch-" xanmod-version ".xz"))
+                        "/releases/download/" xanmod-version "-" xanmod-revision
+                        "/patch-" xanmod-version "-" xanmod-revision ".xz"))
     (sha256 (base32
              "0qb6cmf6pjp4k4yk1nbsd9klnynharhyma2lzpnk9imm6mx3dqap"))))
 
@@ -67,10 +67,10 @@
   (origin
     (method url-fetch)
     ;; guix download https://github.com/anthraxx/linux-hardened/releases/download/6.1.11-hardened1/linux-hardened-6.1.11-hardened1.patch -o ~/dotfiles/mychannel/me/packages/patches/linux-6.1.11-hardened1.patch 
-    (file-name (string-append "linux-" hardened-version ".patch"))
+    (file-name (string-append "linux-" hardened-version "-" hardened-revision ".patch"))
     (uri (string-append
           "https://github.com/anthraxx/linux-hardened/releases/download/"
-          hardened-version "/linux-hardened-" hardened-version ".patch"))
+          hardened-version "-" hardened-revision "/linux-hardened-" hardened-version "-" hardened-revision ".patch"))
     (sha256 (base32
              "1pydcjy2cjnb4zxcqr41hr34fg8alph314xasdsfvdw4zaz55s6h"))))
 
