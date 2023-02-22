@@ -25,7 +25,6 @@
   #:use-module (gnu services)
   #:use-module (gnu services base)
   #:use-module (gnu services configuration)
-  #:use-module (gnu services pm)
   #:use-module (gnu services shepherd)
   #:use-module (gnu system shadow)
   #:use-module (me packages linux)
@@ -33,41 +32,53 @@
             tlp-configuration))
 
 (define (uglify-field-name field-name)
-  (@@ (gnu services pm) (uglify-field-name field-name)))
+  (let ((str (symbol->string field-name)))
+    (string-join (string-split
+                  (string-upcase
+                   (if (string-suffix? "?" str)
+                       (substring str 0 (1- (string-length str)))
+                       str))
+                  #\-)
+                 "_")))
 
 (define (serialize-field field-name val)
-  (@@ (gnu services pm) (serialize-field field-name val)))
+  (format #t "~a=~a\n" (uglify-field-name field-name) val))
 
 (define (serialize-boolean field-name val)
-  (@@ (gnu services pm) (serialize-boolean field-name val)))
+  (serialize-field field-name (if val "1" "0")))
 (define-maybe boolean)
 
 (define (serialize-string field-name val)
-  (@@ (gnu services pm) (serialize-string field-name val)))
+  (serialize-field field-name val))
 (define-maybe string)
 
 (define (space-separated-string-list? val)
-  (@@ (gnu services pm) (space-separated-string-list? val)))
+  (and (list? val)
+       (and-map (lambda (x)
+                  (and (string? x) (not (string-index x #\space))))
+                val)))
 (define (serialize-space-separated-string-list field-name val)
-  (@@ (gnu services pm) (serialize-space-separated-string-list field-name val)))
+  (serialize-field field-name
+                   (format #f "~s"
+                           (string-join val " "))))
 (define-maybe space-separated-string-list)
 
 (define (non-negative-integer? val)
-  (@@ (gnu services pm) (non-negative-integer? val)))
+  (and (exact-integer? val) (not (negative? val))))
 (define (serialize-non-negative-integer field-name val)
-  (@@ (gnu services pm) (serialize-non-negative-integer field-name val)))
+  (serialize-field field-name val))
 (define-maybe non-negative-integer)
 
 (define (on-off-boolean? val)
-  (@@ (gnu services pm) (on-off-boolean? val)))
+  (boolean? val))
 (define (serialize-on-off-boolean field-name val)
-  (@@ (gnu services pm) (serialize-on-off-boolean field-name val)))
+  (serialize-field field-name (if val "on" "off")))
 (define-maybe on-off-boolean)
 
 (define (y-n-boolean? val)
-  (@@ (gnu services pm) (y-n-boolean? val)))
+  (boolean? val))
 (define (serialize-y-n-boolean field-name val)
-  (@@ (gnu services pm) (serialize-y-n-boolean field-name val)))
+  (serialize-field field-name (if val "Y" "N")))
 
 (define-configuration tlp-configuration
   (tlp
