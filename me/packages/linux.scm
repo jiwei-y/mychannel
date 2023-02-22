@@ -669,6 +669,24 @@
      "This package provides a flexible Python Kconfig implementation")
     (license #f)))
 
+(define-public tlp-git
+  (package
+    (inherit tlp)
+    (name "tlp-git")
+    (version "13022023")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/linrunner/TLP")
+             (commit "5248ad1a4e7076c68b3e581dbb4f26fc4c414495")))
+       (file-name (git-file-name name version))
+       (sha256
+        ;; git clone --depth 1 https://github.com/linrunner/TLP ~/Downloads/TLP
+        ;; guix hash --serializer=nar -x ~/Downloads/TLP
+        ;; rm -rf ~/Downloads/TLP
+        (base32 "1snk9vbbgcznn9fa9s2nagyp9xddfs69y2d1fhghllvi39a5qzp9"))))))
+
 (define-public tuxedo-keyboard
   (package
     (name "tuxedo-keyboard")
