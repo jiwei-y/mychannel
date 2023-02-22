@@ -688,13 +688,13 @@
         (base32 "1snk9vbbgcznn9fa9s2nagyp9xddfs69y2d1fhghllvi39a5qzp9"))))
     (arguments
         (substitute-keyword-arguments (package-arguments tlp)
-          (((#:phases phases)
+          ((#:phases phases)
           #~(modify-phases #$phases
               (add-after 'setenv 'setenv-extra
                 (lambda* (#:key outputs #:allow-other-keys)
                   (let ((out (assoc-ref outputs "out")))
                     (setenv "TLP_ZSHCPL" 
-                            (string-append out "/share/zsh/site-functions"))))))))))))
+                            (string-append out "/share/zsh/site-functions")))))))))))
 
 (define-public tuxedo-keyboard
   (package
