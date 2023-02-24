@@ -262,8 +262,6 @@
       ("CONFIG_MODPROBE_PATH" . "/run/current-system/profile/bin/modprobe")
 
       ;; adjustment to khc
-      ("CONFIG_DEBUG_FS" . #t)      ;; NOTE: temporary
-
       ("CONFIG_MODULES" . #t)
       ("CONFIG_FB" . #t)
       ("CONFIG_VT" . #t)
