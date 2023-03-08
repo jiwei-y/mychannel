@@ -39,8 +39,9 @@
   #:use-module (guix build-system python)
   #:use-module (guix utils)
   #:use-module (gnu packages)
-  #:use-module (gnu packages commencement)
+;  #:use-module (gnu packages commencement)
   #:use-module (gnu packages emacs)
+  #:use-module (gnu packages gcc)
   #:use-module (gnu packages glib)
   #:use-module (gnu packages gtk)
   #:use-module (gnu packages ibus)
@@ -184,7 +185,7 @@ Recently the capability to type different languages at the same time without hav
             zinnia))
     (native-inputs
       (list clang
-            gcc-toolchain
+            libstdc++
             python
             python-six
             python-gyp
