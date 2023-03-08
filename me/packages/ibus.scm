@@ -73,7 +73,8 @@
        (modify-phases %standard-phases
          (add-after 'install 'wrap
            (lambda* (#:key inputs outputs #:allow-other-keys)
-             (wrap-program
+             (wrap-program (string-append (assoc-ref outputs "out")
+                                          "/libexec/ibus-setup-typing-booster")
                `("LD_LIBRARY_PATH" ":" prefix
                  (,(string-append (assoc-ref inputs "m17n-lib") "/lib"))))
              #t))
@@ -140,15 +141,15 @@ Recently the capability to type different languages at the same time without hav
                           "ibus_component_dir=" out "/share/ibus/component"
                           "ibus_mozc_install_dir=" out "/share/ibus-mozc"
                           "emacs_helper_dir=" out "/bin"
-                          "emacs_client_dir=" out "/share/emacs/site-lisp/emacs-mozc" "\"")
-                       (invoke "python" "build_mozc.py" "gyp"
+                          "emacs_client_dir=" out "/share/emacs/site-lisp/emacs-mozc" "\""))
+                       (invoke "python" "src/build_mozc.py" "gyp"
                                (string-append "--gypdir=" gyp "/bin")
                                (string-append "--server_dir="
-                                              out "/lib/mozc"))))))
+                                              out "/lib/mozc")))))
          (replace 'build
            (lambda* (#:key inputs outputs #:allow-other-keys)
              (add-installed-pythonpath inputs outputs)
-             (invoke "python" "build_mozc.py" "build" "-c" "Release"
+             (invoke "python" "src/build_mozc.py" "build" "-c" "Release"
                      "unix/ibus/ibus.gyp:ibus_mozc"
                      "unix/emacs/emacs.gyp:mozc_emacs_helper"
                      "server/server.gyp:mozc_server"
