@@ -43,6 +43,7 @@
   #:use-module (gnu packages glib)
   #:use-module (gnu packages gtk)
   #:use-module (gnu packages ibus)
+  #:use-module (gnu packages llvm)
   #:use-module (gnu packages ninja)
   #:use-module (gnu packages ocr)
   #:use-module (gnu packages pkg-config)
