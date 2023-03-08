@@ -184,7 +184,7 @@ Recently the capability to type different languages at the same time without hav
             zinnia))
     (native-inputs
       (list clang
-            gcc-final
+            gcc-toolchain
             python
             python-six
             python-gyp
