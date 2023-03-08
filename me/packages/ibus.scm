@@ -80,7 +80,8 @@
              #t))
          (delete 'check))))
     (native-inputs
-     (list pkg-config
+     (list clang
+           pkg-config
            gobject-introspection))
     (inputs
      (list python
