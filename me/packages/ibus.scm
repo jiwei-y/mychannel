@@ -109,10 +109,11 @@ Recently the capability to type different languages at the same time without hav
               (method git-fetch)
               (uri (git-reference
                     (url "https://github.com/google/mozc")
-                    (commit "664d0c51ac17860dcfdbc0d005e904554806a660")))
+                    (commit "664d0c51ac17860dcfdbc0d005e904554806a660")
+                    (recursive? #t)))
               (sha256
-               ;; git clone --depth 1 https://github.com/google/mozc ~/Downloads/mozc && guix hash --serializer=nar -x ~/Downloads/mozc && rm -rf ~/Downloads/mozc
-               (base32 "1h9d7a7kwb07a5vf8cs40x25l4g650ahcd3q72wrjklld30fc0hb"))))
+               ;; git clone --depth 1 --recurse-submodules https://github.com/google/mozc ~/Downloads/mozc && guix hash --serializer=nar -x ~/Downloads/mozc && rm -rf ~/Downloads/mozc
+               (base32 "0kp5xi02qv7xyfrsvm4b22ap8q93l7bgwlqb3njf5czz08q20bg0"))))
     (build-system python-build-system)
     (arguments
      `(#:use-setuptools? #f
