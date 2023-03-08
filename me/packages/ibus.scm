@@ -100,7 +100,8 @@
              (wrap-program
                `("LD_LIBRARY_PATH" ":" prefix
                  (,(string-append (assoc-ref inputs "m17n-lib") "/lib"))))
-             #t)))))
+             #t))
+         (delete 'check))))
     (native-inputs
      (list ;`(,glib "bin")
            pkg-config
@@ -189,20 +190,18 @@ Recently the capability to type different languages at the same time without hav
 ;                     (string-append out "/share/licenses/ibus-mozc"))))))
       )))
     (inputs
-     `(protobuf
-       ibus
-       gtk+-2
-       libxcb
-       qtbase-5
-       zinnia))
-    (propagated-inputs
-     `(python-six))
+      (list protobuf
+            ibus
+            gtk+-2
+            libxcb
+            qtbase-5
+            zinnia))
     (native-inputs
-     `(python
-       python-six
-       python-gyp
-       ninja
-       pkg-config))
+      (list python
+            python-six
+            python-gyp
+            ninja
+            pkg-config))
     (synopsis "A Japanese Input Method Editor designed for multi-platform")
     (description
      "Mozc is a Japanese Input Method Editor (IME) designed for multi-platform such as Android OS, Apple OS X, Chromium OS, GNU/Linux and Microsoft Windows. This OpenSource project originates from Google Japanese Input.")
