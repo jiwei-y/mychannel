@@ -625,9 +625,7 @@
              (commit "295a293b0f21b016b1a9ec0eae1f29e52e70cff1")))
        (file-name (git-file-name name version))
        (sha256
-        ; git clone --depth 1 https://github.com/a13xp0p0v/kconfig-hardened-check ~/Downloads/kconfig-hardened-check
-        ; guix hash --serializer=nar -x ~/Downloads/kconfig-hardened-check
-        ; rm -rf ~/Downloads/kconfig-hardened-check
+        ; git clone --depth 1 https://github.com/a13xp0p0v/kconfig-hardened-check ~/Downloads/kconfig-hardened-check && guix hash --serializer=nar -x ~/Downloads/kconfig-hardened-check && rm -rf ~/Downloads/kconfig-hardened-check
         (base32 "0bpdy2a7l75y5cqzzc92nh4gapzgza8ml5i8ximr6brf6pr3681z"))))
     (build-system python-build-system)
     (arguments
@@ -682,9 +680,7 @@
              (commit "5248ad1a4e7076c68b3e581dbb4f26fc4c414495")))
        (file-name (git-file-name name version))
        (sha256
-        ;; git clone --depth 1 https://github.com/linrunner/TLP ~/Downloads/TLP
-        ;; guix hash --serializer=nar -x ~/Downloads/TLP
-        ;; rm -rf ~/Downloads/TLP
+        ;; git clone --depth 1 https://github.com/linrunner/TLP ~/Downloads/TLP && guix hash --serializer=nar -x ~/Downloads/TLP && rm -rf ~/Downloads/TLP
         (base32 "1snk9vbbgcznn9fa9s2nagyp9xddfs69y2d1fhghllvi39a5qzp9"))))
     (arguments
         (substitute-keyword-arguments (package-arguments tlp)
