@@ -78,11 +78,11 @@
              #t))
          (delete 'check))))
     (native-inputs
-     (list ;`(,glib "bin")
-           pkg-config
+     (list pkg-config
            gobject-introspection))
     (inputs
      (list python
+           glib
            gtk+
            ibus
            m17n-lib))
@@ -113,7 +113,7 @@ Recently the capability to type different languages at the same time without hav
                (base32 "1h9d7a7kwb07a5vf8cs40x25l4g650ahcd3q72wrjklld30fc0hb"))))
     (build-system python-build-system)
     (arguments
-     `(#:use-setuptools? #f
+     '(#:use-setuptools? #f
        #:tests? #f
        #:phases
        (modify-phases %standard-phases
