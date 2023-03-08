@@ -126,13 +126,13 @@ Recently the capability to type different languages at the same time without hav
 ;             (let ((gyp (assoc-ref inputs "python-gyp")))
 ;               (rmdir "src/third_party/gyp/")
 ;               (symlink gyp "src/third_party/gyp"))))
-         (add-after 'unpack 'remove-clang
-         ;; do some harden which we can't do in extra options
-           (lambda* (#:key inputs #:allow-other-keys)
-             (substitute* "src/gyp/common.gypi"
-               (("-lc++") 
-               "-lstdc++"))))
-         (add-after 'remove-clang 'configure
+;         (add-after 'unpack 'preconfigure
+;         ;; do some harden which we can't do in extra options
+;           (lambda* (#:key inputs #:allow-other-keys)
+;             (substitute* "src/gyp/common.gypi"
+;               (("-lc++") 
+;               "-lstdc++"))))
+         (add-after 'unpack 'configure
            (lambda* (#:key inputs outputs #:allow-other-keys)
              (let ((gyp (assoc-ref inputs "python-gyp"))
                    (out (assoc-ref outputs "out")))
