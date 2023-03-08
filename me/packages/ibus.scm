@@ -34,6 +34,7 @@
   #:use-module (guix gexp)
   #:use-module (guix download)
   #:use-module (guix git-download)
+  #:use-module (guix build-system glib-or-gtk)
   #:use-module (guix build-system gnu)
   #:use-module (guix build-system python)
   #:use-module (guix utils)
@@ -82,7 +83,6 @@
            gobject-introspection))
     (inputs
      (list python
-           glib
            gtk+
            ibus
            m17n-lib))
@@ -113,8 +113,7 @@ Recently the capability to type different languages at the same time without hav
                (base32 "1h9d7a7kwb07a5vf8cs40x25l4g650ahcd3q72wrjklld30fc0hb"))))
     (build-system python-build-system)
     (arguments
-     '(#:use-setuptools? #f
-       #:tests? #f
+     '(#:tests? #f
        #:phases
        (modify-phases %standard-phases
 ;         (add-after 'unpack 'symlink
@@ -124,8 +123,8 @@ Recently the capability to type different languages at the same time without hav
 ;               (symlink gyp "src/third_party/gyp"))))
          (replace 'configure
            (lambda* (#:key inputs outputs #:allow-other-keys)
-             (let* ((gyp (assoc-ref inputs "python-gyp"))
-                    (out (assoc-ref outputs "out")))
+             (let ((gyp (assoc-ref inputs "python-gyp"))
+                   (out (assoc-ref outputs "out")))
                ;; (chdir "src")
                (add-installed-pythonpath inputs outputs)
                (setenv "GYP_DEFINES" 
@@ -155,7 +154,10 @@ Recently the capability to type different languages at the same time without hav
                      "gui/gui.gyp:mozc_tool"
                      "renderer/renderer.gyp:mozc_renderer"
                      "--use_gyp_for_ibus_build")))
-         (delete 'check)
+         (replace 'check
+           (lambda* (#:key tests? #:allow-other-keys)
+             (when tests?
+               (invoke "pytest"))))
 ;         (replace 'install
 ;           (lambda* (#:key inputs outputs #:allow-other-keys)
 ;             (let* (((out (assoc-ref outputs "out")))
@@ -163,7 +165,7 @@ Recently the capability to type different languages at the same time without hav
 ;             (setenv (string-append "PREFIX=" out))
 ;             (invoke "install" "-d"
 ;                     (string-append out "/share/licenses/ibus-mozc"))))))
-      )))
+)))
     (inputs
       (list protobuf
             ibus
