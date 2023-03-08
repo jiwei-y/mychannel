@@ -113,7 +113,8 @@ Recently the capability to type different languages at the same time without hav
                (base32 "1h9d7a7kwb07a5vf8cs40x25l4g650ahcd3q72wrjklld30fc0hb"))))
     (build-system python-build-system)
     (arguments
-     `(#:tests? #f
+     `(#:use-setuptools? #f
+       #:tests? #f
        #:phases
        (modify-phases %standard-phases
 ;         (add-after 'unpack 'symlink
@@ -121,6 +122,39 @@ Recently the capability to type different languages at the same time without hav
 ;             (let ((gyp (assoc-ref inputs "python-gyp")))
 ;               (rmdir "src/third_party/gyp/")
 ;               (symlink gyp "src/third_party/gyp"))))
+         (add-after 'unpack 'configure
+           (lambda* (#:key inputs outputs #:allow-other-keys)
+             (let ((gyp (assoc-ref inputs "python-gyp"))
+                   (out (assoc-ref outputs "out")))
+               ;; (chdir "src")
+               (add-installed-pythonpath inputs outputs)
+               (setenv "GYP_DEFINES" 
+                        (string-append
+                          "\"" "document_dir=" out "/share/doc/mozc"
+                          "use_libzinnia=1"
+                          "use_libprotobuf=1"
+                          "ibus_mozc_path=" out "/lib/ibus-mozc/ibus-engine-mozc"
+                          "ibus_mozc_icon_path=" out "/share/ibus-mozc/product_icon.png"
+                          "mozc_dir=" out "/lib/mozc"
+                          "mozc_icons_dir=" out "/share/icons/mozc"
+                          "ibus_component_dir=" out "/share/ibus/component"
+                          "ibus_mozc_install_dir=" out "/share/ibus-mozc"
+                          "emacs_helper_dir=" out "/bin"
+                          "emacs_client_dir=" out "/share/emacs/site-lisp/emacs-mozc" "\"")
+                       (invoke "python" "build_mozc.py" "gyp"
+                               (string-append "--gypdir=" gyp "/bin")
+                               (string-append "--server_dir="
+                                              out "/lib/mozc"))))))
+         (replace 'build
+           (lambda* (#:key inputs outputs #:allow-other-keys)
+             (add-installed-pythonpath inputs outputs)
+             (invoke "python" "build_mozc.py" "build" "-c" "Release"
+                     "unix/ibus/ibus.gyp:ibus_mozc"
+                     "unix/emacs/emacs.gyp:mozc_emacs_helper"
+                     "server/server.gyp:mozc_server"
+                     "gui/gui.gyp:mozc_tool"
+                     "renderer/renderer.gyp:mozc_renderer"
+                     "--use_gyp_for_ibus_build")))
          (delete 'check)
 ;         (replace 'install
 ;           (lambda* (#:key inputs outputs #:allow-other-keys)
@@ -129,7 +163,7 @@ Recently the capability to type different languages at the same time without hav
 ;             (setenv (string-append "PREFIX=" out))
 ;             (invoke "install" "-d"
 ;                     (string-append out "/share/licenses/ibus-mozc"))))))
-)))
+      )))
     (inputs
       (list protobuf
             ibus
