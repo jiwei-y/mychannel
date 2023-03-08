@@ -123,7 +123,13 @@ Recently the capability to type different languages at the same time without hav
 ;             (let ((gyp (assoc-ref inputs "python-gyp")))
 ;               (rmdir "src/third_party/gyp/")
 ;               (symlink gyp "src/third_party/gyp"))))
-         (add-after 'unpack 'configure
+         (add-after 'unpack 'remove-clang
+         ;; do some harden which we can't do in extra options
+           (lambda* (#:key inputs #:allow-other-keys)
+             (substitute* "src/gyp/common.gypi"
+               (("-lc++") 
+               "-lstdc++"))))
+         (add-after 'remove-clang 'configure
            (lambda* (#:key inputs outputs #:allow-other-keys)
              (let ((gyp (assoc-ref inputs "python-gyp"))
                    (out (assoc-ref outputs "out")))
@@ -145,7 +151,8 @@ Recently the capability to type different languages at the same time without hav
                        (invoke "python" "src/build_mozc.py" "gyp"
                                (string-append "--gypdir=" gyp "/bin")
                                (string-append "--server_dir="
-                                              out "/lib/mozc")))))
+                                              out "/lib/mozc")
+                               "--target_platform=Linux"))))
          (replace 'build
            (lambda* (#:key inputs outputs #:allow-other-keys)
              (add-installed-pythonpath inputs outputs)
