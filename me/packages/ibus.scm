@@ -67,7 +67,7 @@
                ;; rm -rf ~/Downloads/ibus-typing-booster-2.22.1.tar.gz
                (base32
                 "17p1iyc8av3zabps0168i7d5hd95r3wyf9whjx607mzvp67jvk0g"))))
-    (build-system gnu-build-system)
+    (build-system glib-or-gtk-build-system)
     (arguments
      `(#:phases
        (modify-phases %standard-phases
