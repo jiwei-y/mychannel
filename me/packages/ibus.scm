@@ -81,8 +81,7 @@
              #t))
          (delete 'check))))
     (native-inputs
-     (list clang
-           pkg-config
+     (list pkg-config
            gobject-introspection))
     (inputs
      (list python
@@ -182,7 +181,8 @@ Recently the capability to type different languages at the same time without hav
             qtbase-5
             zinnia))
     (native-inputs
-      (list python
+      (list clang
+            python
             python-six
             python-gyp
             ninja
