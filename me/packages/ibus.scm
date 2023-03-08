@@ -52,6 +52,7 @@
   #:use-module (gnu packages datastructures)
   #:use-module (gnu packages dbm)
   #:use-module (gnu packages docbook)
+  #:use-module (gnu packages emacs)
   #:use-module (gnu packages freedesktop)
   #:use-module (gnu packages gettext)
   #:use-module (gnu packages glib)
