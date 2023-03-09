@@ -43,6 +43,7 @@
   #:use-module (gnu packages emacs)
   #:use-module (gnu packages glib)
   #:use-module (gnu packages gtk)
+  #:use-module (gnu packages hunspell)
   #:use-module (gnu packages ibus)
   #:use-module (gnu packages llvm)
   #:use-module (gnu packages ninja)
@@ -71,23 +72,66 @@
                 "17p1iyc8av3zabps0168i7d5hd95r3wyf9whjx607mzvp67jvk0g"))))
     (build-system glib-or-gtk-build-system)
     (arguments
-     `(#:phases
-       (modify-phases %standard-phases
-         (add-after 'install 'wrap
-           (lambda* (#:key inputs outputs #:allow-other-keys)
-             (wrap-program (string-append (assoc-ref outputs "out")
-                                          "/libexec/ibus-setup-typing-booster")
-               `("LD_LIBRARY_PATH" ":" prefix
-                 (,(string-append (assoc-ref inputs "m17n-lib") "/lib"))))
-             #t))
-         (delete 'check))))
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'install 'wrap-programs
+            (lambda* (#:key inputs #:allow-other-keys)
+              (for-each
+               (lambda (prog)
+                 (wrap-program (string-append #$output "/libexec/" prog)
+                   `("GUIX_PYTHONPATH" ":" prefix
+                     (,(getenv "GUIX_PYTHONPATH")))
+                   `("GI_TYPELIB_PATH" ":" prefix
+                     (,(getenv "GI_TYPELIB_PATH")
+                      ,(string-append #$output "/lib/girepository-1.0")))
+                   `("LD_LIBRARY_PATH" ":" prefix
+                     (,(string-append (assoc-ref inputs "m17n-lib") "/lib")))
+                   `("DICPATH" ":" prefix
+                     (,(string-append (assoc-ref inputs "hunspell-dict-fr-classique") "/share/hunspell")
+                      ,(string-append (assoc-ref inputs "hunspell-dict-fr-moderne") "/share/hunspell")
+                      ,(string-append (assoc-ref inputs "hunspell-dict-fr-réforme-1990") "/share/hunspell")
+                      ,(string-append (assoc-ref inputs "hunspell-dict-fr-toutes-variantes") "/share/hunspell")
+                      ,(string-append (assoc-ref inputs "hunspell-dict-pl") "/share/hunspell")
+                      ,(string-append (assoc-ref inputs "hunspell-dict-de") "/share/hunspell")
+                      ,(string-append (assoc-ref inputs "hunspell-dict-hu") "/share/hunspell")
+                      ,(string-append (assoc-ref inputs "hunspell-dict-he-il") "/share/hunspell")
+                      ,(string-append (assoc-ref inputs "hunspell-dict-it-it") "/share/hunspell")
+                      ,(string-append (assoc-ref inputs "hunspell-dict-en") "/share/hunspell")
+                      ,(string-append (assoc-ref inputs "hunspell-dict-en-au") "/share/hunspell")
+                      ,(string-append (assoc-ref inputs "hunspell-dict-en-ca") "/share/hunspell")
+                      ,(string-append (assoc-ref inputs "hunspell-dict-en-gb") "/share/hunspell")
+                      ,(string-append (assoc-ref inputs "hunspell-dict-en-gb-ize") "/share/hunspell")
+                      ,(string-append (assoc-ref inputs "hunspell-dict-en-us") "/share/hunspell")))
+                    ))
+               '("/bin/emoji-picker"
+                 "/libexec/ibus-engine-anthy"
+                 "/libexec/ibus-setup-anthy"))))
+          (delete 'check))))
     (native-inputs
      (list pkg-config
            gobject-introspection))
     (inputs
      (list python
+           python-dbus
+           python-pygobject
            gtk+
            ibus
+           hunspell-dict-fr-classique
+           hunspell-dict-fr-moderne
+           hunspell-dict-fr-réforme-1990
+           hunspell-dict-fr-toutes-variantes
+           hunspell-dict-pl
+           hunspell-dict-de
+           hunspell-dict-hu
+           hunspell-dict-he-il
+           hunspell-dict-it-it
+           hunspell-dict-en
+           hunspell-dict-en-au
+           hunspell-dict-en-ca
+           hunspell-dict-en-gb
+           hunspell-dict-en-gb-ize
+           hunspell-dict-en-us
            m17n-lib))
     (synopsis "A completion input method for faster typing")
     (description "Ibus-typing-booster is a completion input method to speed-up typing.
@@ -151,9 +195,9 @@ Recently the capability to type different languages at the same time without hav
                           "document_dir=" out "/share/doc/mozc"
                           "use_libzinnia=1"
                           "use_libprotobuf=1"
-                          "ibus_mozc_path=" out "/lib/ibus-mozc/ibus-engine-mozc"
+                          "ibus_mozc_path=" out "/libexec/ibus-mozc/ibus-engine-mozc"
                           "ibus_mozc_icon_path=" out "/share/ibus-mozc/product_icon.png"
-                          "mozc_dir=" out "/lib/mozc"
+                          "mozc_dir=" out "/libexec/mozc"
                           "mozc_icons_dir=" out "/share/icons/mozc"
                           "ibus_component_dir=" out "/share/ibus/component"
                           "ibus_mozc_install_dir=" out "/share/ibus-mozc"
@@ -162,7 +206,7 @@ Recently the capability to type different languages at the same time without hav
                        (invoke "python" "src/build_mozc.py" "gyp"
                                (string-append "--gypdir=" gyp "/bin")
                                (string-append "--server_dir="
-                                              out "/lib/mozc")
+                                              out "/libexec/mozc")
                                "--target_platform=Linux"))))
          (replace 'build
            (lambda* (#:key inputs outputs #:allow-other-keys)
@@ -177,10 +221,10 @@ Recently the capability to type different languages at the same time without hav
          (replace 'install
            (lambda* (#:key inputs outputs #:allow-other-keys)
              (let* ((out (assoc-ref outputs "out"))
-                    (ibus_mozc_exec_dir (string-append out "/lib/ibus-mozc"))
+                    (ibus_mozc_exec_dir (string-append out "/libexec/ibus-mozc"))
                     (ibus_component_dir (string-append out "/share/ibus/component"))
                     (ibus_mozc_install_dir (string-append out "/share/ibus-mozc"))
-                    (mozc_dir (string-append out "/lib/mozc")))
+                    (mozc_dir (string-append out "/libexec/mozc")))
                (add-installed-pythonpath inputs outputs)
                (rename-file "src/out_linux/Release/ibus_mozc" "src/out_linux/Release/ibus-engine-mozc")
                (for-each (lambda (name)
