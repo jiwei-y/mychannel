@@ -79,7 +79,7 @@
             (lambda* (#:key inputs #:allow-other-keys)
               (for-each
                (lambda (prog)
-                 (wrap-program (string-append #$output "/libexec/" prog)
+                 (wrap-program (string-append #$output prog)
                    `("GUIX_PYTHONPATH" ":" prefix
                      (,(getenv "GUIX_PYTHONPATH")))
                    `("GI_TYPELIB_PATH" ":" prefix
@@ -88,10 +88,7 @@
                    `("LD_LIBRARY_PATH" ":" prefix
                      (,(string-append (assoc-ref inputs "m17n-lib") "/lib")))
                    `("DICPATH" ":" prefix
-                     (,(string-append (assoc-ref inputs "hunspell-dict-fr-classique") "/share/hunspell")
-                      ,(string-append (assoc-ref inputs "hunspell-dict-fr-moderne") "/share/hunspell")
-                      ,(string-append (assoc-ref inputs "hunspell-dict-fr-réforme-1990") "/share/hunspell")
-                      ,(string-append (assoc-ref inputs "hunspell-dict-fr-toutes-variantes") "/share/hunspell")
+                     (,(string-append (assoc-ref inputs "hunspell-dict-fr-moderne") "/share/hunspell")
                       ,(string-append (assoc-ref inputs "hunspell-dict-pl") "/share/hunspell")
                       ,(string-append (assoc-ref inputs "hunspell-dict-de") "/share/hunspell")
                       ,(string-append (assoc-ref inputs "hunspell-dict-hu") "/share/hunspell")
@@ -105,8 +102,8 @@
                       ,(string-append (assoc-ref inputs "hunspell-dict-en-us") "/share/hunspell")))
                     ))
                '("/bin/emoji-picker"
-                 "/libexec/ibus-engine-anthy"
-                 "/libexec/ibus-setup-anthy"))))
+                 "/libexec/ibus-engine-typing-booster"
+                 "/libexec/ibus-setup-typing-booster"))))
           (delete 'check))))
     (native-inputs
      (list pkg-config
@@ -260,6 +257,14 @@ Recently the capability to type different languages at the same time without hav
                          '("src/out_linux/Release/mozc_server"
                            "src/out_linux/Release/mozc_tool"
                            "src/out_linux/Release/mozc_emacs_helper")))))
+         (add-after 'install 'wrap
+           (lambda* (#:key outputs #:allow-other-keys)
+             (wrap-program (string-append (assoc-ref outputs "out")
+                                          "/libexec/ibus-mozc/ibus-engine-mozc")
+               `("GUIX_PYTHONPATH" ":" prefix (,(getenv "GUIX_PYTHONPATH")))
+               ;`("GI_TYPELIB_PATH" ":" prefix (,(getenv "GI_TYPELIB_PATH")))
+              )
+             #t))
          (delete 'check)
       )))
     (inputs
