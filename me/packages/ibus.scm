@@ -176,7 +176,46 @@ Recently the capability to type different languages at the same time without hav
                      "--use_gyp_for_ibus_build")))
          (replace 'install
            (lambda* (#:key inputs outputs #:allow-other-keys)
-              (add-installed-pythonpath inputs outputs)))
+             (let* ((out (assoc-ref outputs "out"))
+                    (ibus_mozc_exec_dir (string-append out "/lib/ibus-mozc"))
+                    (ibus_component_dir (string-append out "/share/ibus/component"))
+                    (ibus_mozc_install_dir (string-append out "/share/ibus-mozc"))
+                    (mozc_dir (string-append out "/lib/mozc")))
+               (add-installed-pythonpath inputs outputs)
+               (rename-file "src/out_linux/Release/ibus_mozc" "src/out_linux/Release/ibus-engine-mozc")
+               (for-each (lambda (name)
+                           (install-file name ibus_mozc_exec_dir))
+                         '("src/out_linux/Release/ibus-engine-mozc"))
+               (for-each (lambda (name)
+                           (install-file name ibus_component_dir))
+                         '("src/out_linux/Release/gen/unix/ibus/mozc.xml"))
+               (rename-file "src/data/images/unix/ime_product_icon_opensource-32.png" "src/data/images/unix/product_icon.png")
+               (rename-file "src/data/images/unix/ui-tool.png" "src/data/images/unix/tool.png")
+               (rename-file "src/data/images/unix/ui-properties.png" "src/data/images/unix/properties.png")
+               (rename-file "src/data/images/unix/ui-dictionary.png" "src/data/images/unix/dictionary.png")
+               (rename-file "src/data/images/unix/ui-direct.png" "src/data/images/unix/direct.png")
+               (rename-file "src/data/images/unix/ui-hiragana.png" "src/data/images/unix/hiragana.png")
+               (rename-file "src/data/images/unix/ui-katakana_half.png" "src/data/images/unix/katakana_half.png")
+               (rename-file "src/data/images/unix/ui-katakana_full.png" "src/data/images/unix/katakana_full.png")
+               (rename-file "src/data/images/unix/ui-alpha_half.png" "src/data/images/unix/alpha_half.png")
+               (rename-file "src/data/images/unix/ui-alpha_full.png" "src/data/images/unix/alpha_full.png")
+               (for-each (lambda (name)
+                           (install-file name ibus_mozc_install_dir))
+                         '("src/data/images/unix/product_icon.png"
+                           "src/data/images/unix/tool.png"
+                           "src/data/images/unix/properties.png"
+                           "src/data/images/unix/dictionary.png"
+                           "src/data/images/unix/direct.png"
+                           "src/data/images/unix/hiragana.png"
+                           "src/data/images/unix/katakana_half.png"
+                           "src/data/images/unix/katakana_full.png"
+                           "src/data/images/unix/alpha_half.png"
+                           "src/data/images/unix/alpha_full.png"))
+               (for-each (lambda (name)
+                           (install-file name mozc_dir))
+                         '("src/out_linux/Release/mozc_server"
+                           "src/out_linux/Release/mozc_tool"
+                           "src/out_linux/Release/mozc_emacs_helper")))))
          (delete 'check)
       )))
     (inputs
