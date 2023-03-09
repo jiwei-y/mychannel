@@ -189,16 +189,16 @@ Recently the capability to type different languages at the same time without hav
                (add-installed-pythonpath inputs outputs)
                (setenv "GYP_DEFINES" 
                         (string-append
-                          "document_dir=" out "/share/doc/mozc"
-                          "use_libzinnia=1"
-                          "use_libprotobuf=1"
-                          "ibus_mozc_path=" out "/libexec/ibus-mozc/ibus-engine-mozc"
-                          "ibus_mozc_icon_path=" out "/share/ibus-mozc/product_icon.png"
-                          "mozc_dir=" out "/libexec/mozc"
-                          "mozc_icons_dir=" out "/share/icons/mozc"
-                          "ibus_component_dir=" out "/share/ibus/component"
-                          "ibus_mozc_install_dir=" out "/share/ibus-mozc"
-                          "emacs_helper_dir=" out "/bin"
+                          "document_dir=" out "/share/doc/mozc" " "
+                          "use_libzinnia=1" " "
+                          "use_libprotobuf=1" " "
+                          "ibus_mozc_path=" out "/libexec/ibus-mozc/ibus-engine-mozc" " "
+                          "ibus_mozc_icon_path=" out "/share/ibus-mozc/product_icon.png" " "
+                          "mozc_dir=" out "/libexec/mozc" " "
+                          "mozc_icons_dir=" out "/share/icons/mozc" " "
+                          "ibus_component_dir=" out "/share/ibus/component" " "
+                          "ibus_mozc_install_dir=" out "/share/ibus-mozc" " "
+                          "emacs_helper_dir=" out "/bin" " "
                           "emacs_client_dir=" out "/share/emacs/site-lisp/emacs-mozc"))
                        (invoke "python" "src/build_mozc.py" "gyp"
                                (string-append "--gypdir=" gyp "/bin")
