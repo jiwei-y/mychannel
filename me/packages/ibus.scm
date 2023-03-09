@@ -39,9 +39,8 @@
   #:use-module (guix build-system python)
   #:use-module (guix utils)
   #:use-module (gnu packages)
-;  #:use-module (gnu packages commencement)
+  #:use-module (gnu packages commencement)
   #:use-module (gnu packages emacs)
-  #:use-module (gnu packages gcc)
   #:use-module (gnu packages glib)
   #:use-module (gnu packages gtk)
   #:use-module (gnu packages ibus)
@@ -127,13 +126,21 @@ Recently the capability to type different languages at the same time without hav
 ;             (let ((gyp (assoc-ref inputs "python-gyp")))
 ;               (rmdir "src/third_party/gyp/")
 ;               (symlink gyp "src/third_party/gyp"))))
-;         (add-after 'unpack 'preconfigure
-;         ;; do some harden which we can't do in extra options
-;           (lambda* (#:key inputs #:allow-other-keys)
-;             (substitute* "src/gyp/common.gypi"
-;               (("-lc++") 
-;               "-lstdc++"))))
-         (add-after 'unpack 'configure
+         (add-after 'unpack 'fix-gpp
+           (lambda* (#:key inputs #:allow-other-keys)
+             (let ((gcc (assoc-ref inputs "gcc-toolchain")))
+               (setenv "CPLUS_INCLUDE_PATH"
+                       (string-append gcc "/include/c++:"
+                                      gcc "/include:"
+                                      gcc "/include/c++/x86_64-unknown-linux-gnu:"
+                                      (getenv "CPLUS_INCLUDE_PATH"))))))
+         (add-after 'fix-gpp 'preconfigure
+         ;; do some harden which we can't do in extra options
+           (lambda* (#:key inputs #:allow-other-keys)
+             (substitute* "src/gyp/common.gypi"
+               (("-lc++") 
+               "-lstdc"))))
+         (add-after 'preconfigure 'configure
            (lambda* (#:key inputs outputs #:allow-other-keys)
              (let ((gyp (assoc-ref inputs "python-gyp"))
                    (out (assoc-ref outputs "out")))
@@ -141,7 +148,7 @@ Recently the capability to type different languages at the same time without hav
                (add-installed-pythonpath inputs outputs)
                (setenv "GYP_DEFINES" 
                         (string-append
-                          "\"" "document_dir=" out "/share/doc/mozc"
+                          "document_dir=" out "/share/doc/mozc"
                           "use_libzinnia=1"
                           "use_libprotobuf=1"
                           "ibus_mozc_path=" out "/lib/ibus-mozc/ibus-engine-mozc"
@@ -151,7 +158,7 @@ Recently the capability to type different languages at the same time without hav
                           "ibus_component_dir=" out "/share/ibus/component"
                           "ibus_mozc_install_dir=" out "/share/ibus-mozc"
                           "emacs_helper_dir=" out "/bin"
-                          "emacs_client_dir=" out "/share/emacs/site-lisp/emacs-mozc" "\""))
+                          "emacs_client_dir=" out "/share/emacs/site-lisp/emacs-mozc"))
                        (invoke "python" "src/build_mozc.py" "gyp"
                                (string-append "--gypdir=" gyp "/bin")
                                (string-append "--server_dir="
@@ -165,16 +172,12 @@ Recently the capability to type different languages at the same time without hav
                      "unix/emacs/emacs.gyp:mozc_emacs_helper"
                      "server/server.gyp:mozc_server"
                      "gui/gui.gyp:mozc_tool"
-                     "renderer/renderer.gyp:mozc_renderer"
+                     ;"renderer/renderer.gyp:mozc_renderer"
                      "--use_gyp_for_ibus_build")))
+         (replace 'install
+           (lambda* (#:key inputs outputs #:allow-other-keys)
+              (add-installed-pythonpath inputs outputs)))
          (delete 'check)
-;         (replace 'install
-;           (lambda* (#:key inputs outputs #:allow-other-keys)
-;             (let* (((out (assoc-ref outputs "out")))
-;             (add-installed-pythonpath inputs outputs)
-;             (setenv (string-append "PREFIX=" out))
-;             (invoke "install" "-d"
-;                     (string-append out "/share/licenses/ibus-mozc"))))))
       )))
     (inputs
       (list protobuf
@@ -185,7 +188,7 @@ Recently the capability to type different languages at the same time without hav
             zinnia))
     (native-inputs
       (list clang
-            libstdc++
+            gcc-toolchain
             python
             python-six
             python-gyp
