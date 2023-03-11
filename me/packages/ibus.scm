@@ -160,8 +160,6 @@ Recently the capability to type different languages at the same time without hav
     (arguments
      `(#:use-setuptools? #f
        #:tests? #f
-       #:modules ((ice-9 match)
-                  ,@%python-build-system-modules)
        #:phases
        (modify-phases %standard-phases
 ;         (add-after 'unpack 'symlink
@@ -177,13 +175,7 @@ Recently the capability to type different languages at the same time without hav
                                       gcc "/include:"
                                       gcc "/include/c++/x86_64-unknown-linux-gnu:"
                                       (getenv "CPLUS_INCLUDE_PATH"))))))
-         (add-after 'fix-gpp 'preconfigure
-         ;; do some harden which we can't do in extra options
-           (lambda* (#:key inputs #:allow-other-keys)
-             (substitute* "src/gyp/common.gypi"
-               (("-lc++") 
-               "-lstdc"))))
-         (add-after 'preconfigure 'configure
+         (replace 'configure
            (lambda* (#:key inputs outputs #:allow-other-keys)
              (let ((gyp (assoc-ref inputs "python-gyp"))
                    (out (assoc-ref outputs "out")))
