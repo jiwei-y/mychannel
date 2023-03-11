@@ -160,6 +160,8 @@ Recently the capability to type different languages at the same time without hav
     (arguments
      `(#:use-setuptools? #f
        #:tests? #f
+       #:modules ((ice-9 match)
+                  ,@%python-build-system-modules)
        #:phases
        (modify-phases %standard-phases
 ;         (add-after 'unpack 'symlink
