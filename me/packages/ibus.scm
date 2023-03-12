@@ -290,7 +290,7 @@ Recently the capability to type different languages at the same time without hav
     (description
      "Mozc is a Japanese Input Method Editor (IME) designed for multi-platform such as Android OS, Apple OS X, Chromium OS, GNU/Linux and Microsoft Windows. This OpenSource project originates from Google Japanese Input.")
     (home-page "https://github.com/google/mozc")
-    (license bsd-3)))
+    (license license:bsd-3)))
 
 (define-public ibus-mozc-ut
   (package
