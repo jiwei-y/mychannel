@@ -143,7 +143,7 @@ Since then ibus-typing-booster has been improved to support many other languages
 
 Recently the capability to type different languages at the same time without having to switch between languages has been added.")
     (home-page "https://github.com/mike-fabian/ibus-typing-booster")
-    (license gpl3+)))
+    (license license:gpl3+)))
 
 (define-public ibus-mozc
   (package
