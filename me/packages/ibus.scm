@@ -326,7 +326,8 @@ Recently the capability to type different languages at the same time without hav
                        (("#edict") "edict")
                        (("#skk_jisyo") "skk_jisyo")
                        (("#sudachidict") "sudachidict")
-                       (("^git clone.*") "printf done\n"))
+                       (("^git clone.*") "printf done\n")
+                       (("ruby apply_word_hits.rb mozcdic-ut.txt") "ruby apply_word_hits.rb mozcdic-ut.txt\n cat mozcdic-ut.txt >> data/dictionary_oss/dictionary00.txt"))
                      (substitute* (string-append target "/count_word_hits.rb")
                        (("^`wget.*$") ""))
                      (substitute* (string-append target "/remove_duplicate_ut_entries.rb")
@@ -335,8 +336,7 @@ Recently the capability to type different languages at the same time without hav
                      (for-each make-file-writable (find-files target "mozcdic-ut-"))
                      (for-each make-file-writable (find-files target "jawiki-latest-all-titles-"))
                      (with-directory-excursion target
-                       (invoke "bash" "make.sh")
-                       (invoke "cat" "mozcdic-ut.txt" ">>" "data/dictionary_oss/dictionary00.txt")))
+                       (invoke "bash" "make.sh")))
                    #t))))))
     (inputs
      `(("protobuf" ,protobuf)
