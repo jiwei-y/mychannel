@@ -336,7 +336,7 @@ Recently the capability to type different languages at the same time without hav
                      (for-each make-file-writable (find-files target "jawiki-latest-all-titles-"))
                      (with-directory-excursion target
                        (invoke "bash" "make.sh")
-                       (invoke/quiet "cat" "mozcdic-ut.txt" ">>" "data/dictionary_oss/dictionary00.txt")))
+                       (invoke "cat" "mozcdic-ut.txt" ">>" "data/dictionary_oss/dictionary00.txt")))
                    #t))))))
     (inputs
      `(("protobuf" ,protobuf)
