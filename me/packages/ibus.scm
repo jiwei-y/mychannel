@@ -29,7 +29,7 @@
 ;;; along with GNU Guix.  If not, see <http://www.gnu.org/licenses/>.
 
 (define-module (me packages ibus)
-  #:use-module (guix licenses)
+  #:use-module ((guix licenses) #:prefix license:)
   #:use-module (guix packages)
   #:use-module (guix gexp)
   #:use-module (guix download)
@@ -39,6 +39,7 @@
   #:use-module (guix build-system python)
   #:use-module (guix utils)
   #:use-module (gnu packages)
+  #:use-module (gnu packages base)
   #:use-module (gnu packages commencement)
   #:use-module (gnu packages emacs)
   #:use-module (gnu packages glib)
@@ -53,6 +54,7 @@
   #:use-module (gnu packages python)
   #:use-module (gnu packages python-xyz)
   #:use-module (gnu packages qt)
+  #:use-module (gnu packages ruby)
   #:use-module (gnu packages xorg)
   #:use-module (srfi srfi-1))
 
@@ -289,3 +291,179 @@ Recently the capability to type different languages at the same time without hav
      "Mozc is a Japanese Input Method Editor (IME) designed for multi-platform such as Android OS, Apple OS X, Chromium OS, GNU/Linux and Microsoft Windows. This OpenSource project originates from Google Japanese Input.")
     (home-page "https://github.com/google/mozc")
     (license bsd-3)))
+
+(define-public ibus-mozc-ut
+  (package
+    (inherit ibus-mozc)
+    (name "ibus-mozc-ut")
+    (version "20230310")
+    (arguments
+        (substitute-keyword-arguments (package-arguments ibus-mozc)
+          ((#:modules modules %python-build-system-modules)
+           `((ice-9 match) ,@modules))
+          ((#:phases phases)
+           #~(modify-phases #$phases
+               (add-after 'fix-gpp 'add-ut
+                 (lambda* (#:key inputs #:allow-other-keys)
+                   (let ((target "src")
+                         (mergeut (assoc-ref inputs "merge-ut-dictionaries")))
+                     (copy-recursively
+                       (string-append mergeut "/src") target)
+                     (for-each
+                       (match-lambda
+                         ((name . path)
+                          (if (string-prefix? "mozcdic-ut-" name)
+                              (let ((dict (string-append path "/" name ".txt.tar.bz2")))
+                                (install-file dict target)))))
+                       inputs)
+                     (install-file
+                       (assoc-ref inputs "jawiki-titles") target)
+                     (for-each (lambda (file)
+                                 (rename-file file "src/jawiki-latest-all-titles-in-ns0.gz"))
+                               (find-files target ".*jawiki-latest-all-titles-.*"))
+                     (substitute* (string-append target "/make.sh")
+                       (("#alt_cannadic") "alt_cannadic")
+                       (("#edict") "edict")
+                       (("#skk_jisyo") "skk_jisyo")
+                       (("#sudachidict") "sudachidict")
+                       (("^git clone.*") "printf done\n"))
+                     (substitute* (string-append target "/count_word_hits.rb")
+                       (("^`wget.*$") ""))
+                     (substitute* (string-append target "/remove_duplicate_ut_entries.rb")
+                       (("https://raw.githubusercontent.com/google/mozc/master/src/") 
+                        ""))
+                     (for-each make-file-writable (find-files target "mozcdic-ut-"))
+                     (for-each make-file-writable (find-files target "jawiki-latest-all-titles-"))
+                     (with-directory-excursion target
+                       (invoke "bash" "make.sh")
+                       (invoke/quiet "cat" "mozcdic-ut.txt" ">>" "data/dictionary_oss/dictionary00.txt")))
+                   #t))))))
+    (inputs
+     `(("protobuf" ,protobuf)
+       ("ibus" ,ibus)
+       ("gtk+-2" ,gtk+-2)
+       ("libxcb" ,libxcb)
+       ("qtbase-5" ,qtbase-5)
+       ("zinnia" ,zinnia)
+       ("mozcdic-ext"
+         ,(origin
+           (method git-fetch)
+           (uri (git-reference
+                 (url "https://github.com/reasonset/mozcdict-ext")
+                 (commit "1041a9ca03e48b29873d950c9ea19de70fde1139")))
+           (file-name "mozcdic-ext")
+           (sha256
+             ;; git clone --depth 1 https://github.com/reasonset/mozcdict-ext ~/Downloads/mozcdic-ext && guix hash  --serializer=nar -x ~/Downloads/mozcdic-ext && rm -rf ~/Downloads/mozcdic-ext
+             (base32
+               "1z7crs1z6p2ja3jr9csbhh1xhlq41grvnrjp8whcqsmqi93sqwry"))))
+       ("merge-ut-dictionaries"
+         ,(origin
+           (method git-fetch)
+           (uri (git-reference
+                 (url "https://github.com/utuhiro78/merge-ut-dictionaries")
+                 (commit "ffaf40e56c3a7b317a6b432bf167415fcfb9077b")))
+           (file-name "merge-ut-dictionaries")
+           (sha256
+             ;; git clone --depth 1 https://github.com/utuhiro78/merge-ut-dictionaries ~/Downloads/merge-ut-dictionaries &&  guix hash --serializer=nar -x ~/Downloads/merge-ut-dictionaries && rm -rf ~/Downloads/merge-ut-dictionaries
+             (base32
+               "06s5mxp2pmxj8kl2fz50w0kfd51dds1bxx6awk95nyjyvpn6n5iz"))))
+       ("mozcdic-ut-alt-cannadic"
+         ,(origin
+           (method git-fetch)
+           (uri (git-reference
+                 (url "https://github.com/utuhiro78/mozcdic-ut-alt-cannadic")
+                 (commit "f59287e569db3e226378380a34e71275654b46d0")))
+           (file-name "mozcdic-ut-alt-cannadic")
+           (sha256
+             ;; git clone --depth 1 https://github.com/utuhiro78/mozcdic-ut-alt-cannadic ~/Downloads/ mozcdic-ut-alt-cannadic && guix hash --serializer=nar -x ~/Downloads/mozcdic-ut-alt-cannadic && rm -rf ~/ Downloads/mozcdic-ut-alt-cannadic
+             (base32
+               "1rmiahhrc8gmcsa2y5agchaw3pkfiajh3pl2q3r1c0s6d6c3mmbb"))))
+       ("mozcdic-ut-edict2"
+         ,(origin
+           (method git-fetch)
+           (uri (git-reference
+                 (url "https://github.com/utuhiro78/mozcdic-ut-edict2")
+                 (commit "58648b11f2134a08cc52ccdfced7f53d7c790bfa")))
+           (file-name "mozcdic-ut-edict2")
+           (sha256
+             ;; git clone --depth 1 https://github.com/utuhiro78/mozcdic-ut-edict2 ~/Downloads/mozcdic-ut-edict2 && guix hash  --serializer=nar -x ~/Downloads/mozcdic-ut-edict2 && rm -rf ~/Downloads/mozcdic-ut-edict2
+             (base32
+               "0ggcgkdb59frbvrpdyfjzjj9b803jjs2pfjbcki8mfiv58vls4vc"))))
+       ("mozcdic-ut-jawiki"
+         ,(origin
+           (method git-fetch)
+           (uri (git-reference
+                 (url "https://github.com/utuhiro78/mozcdic-ut-jawiki")
+                 (commit "c6738c3e23c0b6a0a2e1c1a7014e8b2e2ba598c4")))
+           (file-name "mozcdic-ut-jawiki")
+           (sha256
+             ;; git clone --depth 1 https://github.com/utuhiro78/mozcdic-ut-jawiki ~/Downloads/mozcdic-ut-jawiki && guix hash  --serializer=nar -x ~/Downloads/mozcdic-ut-jawiki && rm -rf ~/Downloads/mozcdic-ut-jawiki
+             (base32
+               "0l9rfma8isxjkzf8dvjaw9s3l20qr5kdcwy4n3vsbgbz4fy043z9"))))
+       ("mozcdic-ut-neologd"
+         ,(origin
+           (method git-fetch)
+           (uri (git-reference
+                 (url "https://github.com/utuhiro78/mozcdic-ut-neologd")
+                 (commit "f881c1c55c73a53341f9a970487e9a7546070333")))
+           (file-name "mozcdic-ut-neologd")
+           (sha256
+             ;; git clone --depth 1 https://github.com/utuhiro78/mozcdic-ut-neologd ~/Downloads/mozcdic-ut-neologd && guix  hash --serializer=nar -x ~/Downloads/mozcdic-ut-neologd && rm -rf ~/Downloads/mozcdic-ut-neologd
+             (base32
+               "1sv18kqw16vqaqlbgf5dw98ad28wyl1j4rjg9kwmf721pfk6d59h"))))
+       ("mozcdic-ut-personal-names"
+         ,(origin
+           (method git-fetch)
+           (uri (git-reference
+                 (url "https://github.com/utuhiro78/mozcdic-ut-personal-names")
+                 (commit "8f12df218861dee45919ff50fdf4e888832d0073")))
+           (file-name "mozcdic-ut-personal-names")
+           (sha256
+             ;; git clone --depth 1 https://github.com/utuhiro78/mozcdic-ut-personal-names ~/Downloads/ mozcdic-ut-personal-names && guix hash --serializer=nar -x ~/Downloads/mozcdic-ut-personal-names && rm -rf ~/ Downloads/mozcdic-ut-personal-names
+             (base32
+               "0vk7x07v94mikkaimr736fa6i1dmbk1dg3g60vjd23prb2lf1hx4"))))
+       ("mozcdic-ut-place-names"
+         ,(origin
+           (method git-fetch)
+           (uri (git-reference
+                 (url "https://github.com/utuhiro78/mozcdic-ut-place-names")
+                 (commit "a601c4f1d35de16c7617b6f59223b9ae62f1b8d4")))
+           (file-name "mozcdic-ut-place-names")
+           (sha256
+             ;; git clone --depth 1 https://github.com/utuhiro78/mozcdic-ut-place-names ~/Downloads/mozcdic-ut-place-names &&  guix hash --serializer=nar -x ~/Downloads/mozcdic-ut-place-names && rm -rf ~/Downloads/mozcdic-ut-place-names
+             (base32
+               "0ycrk0iavd73h267iyml21lp0yldr39kvfglikiqfl02039yk5lx"))))
+       ("mozcdic-ut-skk-jisyo"
+         ,(origin
+           (method git-fetch)
+           (uri (git-reference
+                 (url "https://github.com/utuhiro78/mozcdic-ut-skk-jisyo")
+                 (commit "2cbf5b4652ab0f253880258af4aeaf3dd9d7ae09")))
+           (file-name "mozcdic-ut-skk-jisyo")
+           (sha256
+             ;; git clone --depth 1 https://github.com/utuhiro78/mozcdic-ut-skk-jisyo ~/Downloads/mozcdic-ut-skk-jisyo && guix  hash --serializer=nar -x ~/Downloads/mozcdic-ut-skk-jisyo && rm -rf ~/Downloads/mozcdic-ut-skk-jisyo
+             (base32
+               "0hnlfj2130ql2h30i8s2qzi5c4y08qfwd90j3xyx0m7pmhxrmv3y"))))
+       ("mozcdic-ut-sudachidict"
+         ,(origin
+           (method git-fetch)
+           (uri (git-reference
+                 (url "https://github.com/utuhiro78/mozcdic-ut-sudachidict")
+                 (commit "18b1a7710f2e819129c9f5c86a471c881725e26a")))
+           (file-name "mozcdic-ut-sudachidict")
+           (sha256
+             ;; git clone --depth 1 https://github.com/utuhiro78/mozcdic-ut-sudachidict ~/Downloads/mozcdic-ut-sudachidict &&  guix hash --serializer=nar -x ~/Downloads/mozcdic-ut-sudachidict && rm -rf ~/Downloads/mozcdic-ut-sudachidict
+             (base32
+               "13fs5xc5pngqmjcp7cply76j16sgkdz47sldjg4vga6i1h3cwz7v"))))
+       ("jawiki-titles"
+         ,(origin
+           (method url-fetch)
+           (uri "https://dumps.wikimedia.org/jawiki/latest/jawiki-latest-all-titles-in-ns0.gz")
+           (file-name "jawiki-latest-all-titles-in-ns0.gz")
+           (sha256
+             ;; guix download https://dumps.wikimedia.org/jawiki/latest/jawiki-latest-all-titles-in-ns0.gz -o ~/Downloads/jawiki-latest-all-titles-in-ns0.gz && rm -rf ~/Downloads/jawiki-latest-all-titles-in-ns0.gz
+             (base32
+               "0c14ghgcl34h5ziingjcdvap4y9baxlk61a2d8hygp88riz5ara2"))))))
+    (native-inputs
+      (modify-inputs (package-native-inputs ibus-mozc)
+        (append coreutils ruby tar)))))
